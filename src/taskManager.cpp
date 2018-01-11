@@ -35,7 +35,8 @@ int taskManager::serialComInit(){
     ret = g_serialCom->Open("/dev/ttyUSB0",115200,8,NO,1);
     if(ret==0)
         UART_Dbg("ERROR open serial com failed");
-    UART_Dbg("[end] serialComInit\n");
+    else
+        UART_Dbg("serialComInit OK\n");
     return ret;
 }
 
@@ -86,7 +87,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
     while(TRUE)
     {
         msgQueueLength = g_MsgQueue->Queuelength();
-        UART_Dbg("[--] taskProcessSerialMsg queueLen=%d\n",msgQueueLength);
+//        UART_Dbg("[--] taskProcessSerialMsg queueLen=%d\n",msgQueueLength);
         if(msgQueueLength){
             g_MsgQueue->Dequeue(rawData,dataLen);
             //            UART_Dbg("\nRawData is:");
@@ -125,17 +126,14 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 
 void taskManager::start(){
     int ret=-1;
-    UART_Dbg("[start]\n");
     ret = serialComInit();
     while(!ret){
         UART_Err("[Error] serialComInit failed\n");
         sleep(1);
         ret = serialComInit();
     }
-    UART_Dbg("[pthread_create]\n");
     ret = pthread_create(&serialRecv, NULL,taskRecvSerialMsg, this);
     if(ret) UART_Err("[Error] start taskRecvSerialMsg failed\n");
-
     ret = pthread_create(&serialProcessor, NULL,taskProcessSerialMsg, this);
     if(ret) UART_Err("[Error] start taskProcessSerialMsg failed\n");//若成功则返回0，否则返回出错编号
     pthread_join(serialProcessor,NULL);
