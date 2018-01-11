@@ -63,9 +63,9 @@ unsigned char GetFCS_8(unsigned char *pbuf, unsigned int len)
 
 
 
-serialCom* getSerialCom(){
+serial* getSerialCom(){
     if(g_serialCom==NULL){
-        g_serialCom = new serialCom();
+        g_serialCom = new serial();
     }
     return g_serialCom;
 }

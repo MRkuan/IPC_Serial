@@ -1,5 +1,5 @@
 #include "TransportLayer.h"
-extern serialCom* g_serialCom;
+extern serial* g_serialCom;
 TransportLayer::TransportLayer()
 {
     if(g_serialCom==NULL){
@@ -35,7 +35,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
         }
         printf("\n");
     }
-    g_serialCom->SendData(encodedBuf,len);
+    g_serialCom->Write(encodedBuf,len);
     UART_Dbg("[end]replyACK \n");
 }
 

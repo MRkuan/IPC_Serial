@@ -16,22 +16,24 @@ TEMPLATE = app
 
 
 SOURCES += \
-    demo.cpp \
-    taskManager.cpp \
-    TLVtools.cpp \
-    DataLinkLayer.cpp \
-    TransportLayer.cpp \
-    COBSTool.cpp \
-    MsgQueue.cpp \
-    SerialCom.cpp \
-    common.cpp
+    src/demo.cpp \
+    src/taskManager.cpp \
+    src/TLVtools.cpp \
+    src/DataLinkLayer.cpp \
+    src/TransportLayer.cpp \
+    src/COBSTool.cpp \
+    src/MsgQueue.cpp \
+    src/common.cpp \
+    src/serial.cpp \
+    src/timeout.cpp
 
 HEADERS += \
-    common.h \
-    taskManager.h \
-    TLVtools.h \
-    DataLinkLayer.h \
-    TransportLayer.h \
-    COBSTool.h \
-    MsgQueue.h \
-    SerialCom.h
+    src/common.h \
+    src/taskManager.h \
+    src/TLVtools.h \
+    src/DataLinkLayer.h \
+    src/TransportLayer.h \
+    src/COBSTool.h \
+    src/MsgQueue.h \
+    src/serial.h \
+    src/timeout.h

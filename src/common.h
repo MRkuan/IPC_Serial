@@ -10,7 +10,7 @@
 #include <string.h>
 #include <linux/input.h>
 #include "MsgQueue.h"
-#include "SerialCom.h"
+#include "serial.h"
 
 
 
@@ -58,7 +58,7 @@
 #define TRUE 1
 #define FALSE 0
 const int FramLenMax=75;
-static serialCom* g_serialCom;
+static serial* g_serialCom;
 static MsgQueue* g_MsgQueue;
 
 union U_PacketHeader{
@@ -128,7 +128,7 @@ void printHex(unsigned char *data_buf, ssize_t len, const char *prefixStr);
 
 unsigned char GetFCS_8(unsigned char *pbuf, unsigned int len);
 
-serialCom* getSerialCom();
+serial* getSerialCom();
 
 MsgQueue* getMsgQueue();
 #endif	//__COMMON_H

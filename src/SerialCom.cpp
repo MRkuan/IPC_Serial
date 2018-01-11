@@ -212,7 +212,7 @@ int serialCom::SendData(unsigned char *SendData,unsigned int SendDataLen){
     ret = write(gSerialFd,SendData,SendDataLen);
     if(ret!=SendDataLen)
     {
-        perror("[Error] write data length error %d\n",ret);
+        UART_Err("write data length error %d\n",ret);
         return -1;
     }
     return 0;

@@ -7,7 +7,8 @@
 ****************************************************/
 
 #include "taskManager.h"
-extern serialCom* g_serialCom;
+#include "unistd.h"
+extern serial* g_serialCom;
 extern MsgQueue* g_MsgQueue;
 taskManager::taskManager()
 {
@@ -27,12 +28,12 @@ taskManager::~taskManager()
  * 初始化串口，设置波特率、停止位、校验位等参数
  */
 int taskManager::serialComInit(){
-    int ret=-1;
+    char ret=-1;
     if(g_serialCom==NULL){
-        g_serialCom = new serialCom();
+        g_serialCom = getSerialCom();
     }
-    ret = g_serialCom->SerialInit("/dev/ttyUSB0",115200,8,'N',1);
-    if(ret!=0)
+    ret = g_serialCom->Open("/dev/ttyUSB0",115200,8,NO,1);
+    if(ret==0)
         UART_Dbg("ERROR open serial com failed");
     UART_Dbg("[end] serialComInit\n");
     return ret;
@@ -50,7 +51,7 @@ void* taskManager::taskRecvSerialMsg(void *arg){
     taskManager* pTaskMngr = (taskManager*)arg;
 
     while(TRUE){
-        rawLength = g_serialCom->RecvData(rawData);
+        rawLength = g_serialCom->Read(rawData);
         if(rawLength>0){
             UART_Dbg("\nrawData is :");
             for(int i =0;i<rawLength;i++){
@@ -126,7 +127,7 @@ void taskManager::start(){
     int ret=-1;
     UART_Dbg("[start]\n");
     ret = serialComInit();
-    while(ret){
+    while(!ret){
         UART_Err("[Error] serialComInit failed\n");
         sleep(1);
         ret = serialComInit();
