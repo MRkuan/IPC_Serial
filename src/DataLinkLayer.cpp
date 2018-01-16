@@ -62,6 +62,12 @@ void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
         }
         needRecombine = 1;
         mediaBufIndex = (datalength-1)-tailIndex;
+        if(mediaBufIndex+headIndex>=FramLenMax||mediaBufIndex<0){
+            UART_Err("data len error:mediaLen:%d headIndex:%d\n",mediaBufIndex,headIndex);
+            mediaBufIndex=0;
+            headIndex=0;
+        }
         memcpy(mediaBuf,buf+headIndex,mediaBufIndex);
     }
+
 }

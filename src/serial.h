@@ -14,7 +14,7 @@
 	#include <errno.h>
 #endif
 
-#define BUFFER_SIZE 256
+
 #define TIME_OUT 20 // 20 ms
 
 enum parity

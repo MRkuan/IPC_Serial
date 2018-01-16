@@ -5,12 +5,12 @@
 
 #include "serial.h"
 #include "timeout.h"
-
+#include "common.h"
 #if defined(__WIN32__) || defined(__CYGWIN__)
 
 	char serial::Open(char* port, int baud, char bits, parity parity, char stopbit) 
 	{
-		char tmp[BUFFER_SIZE];
+        char tmp[FramLenMax];
 		
 		// Convert to string
 		sprintf(tmp, "%s", port);
@@ -138,12 +138,12 @@
 		DWORD r = 1;
 		int length = 0;
 		
-		//memset(buffer, 0x00, BUFFER_SIZE);
+        //memset(buffer, 0x00, FramLenMax);
 		
 		while(r > 0)
 		{
 			// Protect buffer
-			if(length >= (BUFFER_SIZE - 1)) return length;
+            if(length >= (FramLenMax - 1)) return length;
 			
 			ReadFile(m_fd, (buffer + length), 1, &r, NULL);
 						
@@ -157,7 +157,7 @@
 
 	char serial::Open(char* port, int baud, char bits, parity parity, char stopbit) 
 	{
-		char tmp[BUFFER_SIZE];
+        char tmp[FramLenMax];
 		
 		// Convert to string
 		sprintf(tmp, "%s", port);
@@ -297,12 +297,12 @@
 		// Set timeout between 2 bytes (20ms)
 		timeout timeout(TIME_OUT);
 		
-		//memset(buffer, 0x00, BUFFER_SIZE);
+        //memset(buffer, 0x00, FramLenMax);
 		
 		while((r > 0) || timeout.end())
 		{
 			// Protect buffer
-			if(length >= (BUFFER_SIZE - 1)) return length;
+            if(length >= (FramLenMax - 1)) return length;
 			
 			r = read(m_fd, (buffer + length), 1);
 						
