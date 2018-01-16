@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
-#include <linux/input.h>
+//#include <linux/input.h>
 #include "MsgQueue.h"
 #include "serial.h"
 

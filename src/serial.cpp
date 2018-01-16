@@ -19,7 +19,7 @@
 		COMMTIMEOUTS timeouts = {MAXDWORD, 0, TIME_OUT, 0, 0};
 		
 		// Create file handle for port
-		m_fd = CreateFile(tmp,
+        m_fd = CreateFileA(tmp,
 						  GENERIC_READ | GENERIC_WRITE, 
 						  0,
 						  NULL,
@@ -108,7 +108,7 @@
 	}
 	
 	
-	char serial::Write(char* buffer, int length) 
+    char serial::Write(unsigned char* buffer, int length)
 	{
 		DWORD r;
 		uint8_t *pos = (uint8_t*)buffer;
@@ -133,7 +133,7 @@
 		return 1;
 	}
 	
-	int serial::Read(char* buffer)
+    int serial::Read(unsigned char* buffer)
 	{
 		DWORD r = 1;
 		int length = 0;
