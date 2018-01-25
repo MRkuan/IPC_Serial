@@ -63,8 +63,8 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
 int TLVtools::singleTLVSendProcessor(U_Tag appDataTag,unsigned short RawAppDatalen,unsigned char* RawAppDataBuf,unsigned char* TLVappDataBuf,unsigned short &totallen){
 
     memcpy((void*)TLVappDataBuf,(void*)&appDataTag,sizeof(appDataTag));
-    memcpy((void*)TLVappDataBuf+sizeof(appDataTag),(void*)&RawAppDatalen,sizeof(RawAppDatalen));
-    memcpy((void*)TLVappDataBuf+sizeof(appDataTag)+sizeof(RawAppDatalen),(void *)RawAppDataBuf,RawAppDatalen);
+    memcpy(TLVappDataBuf+sizeof(appDataTag),(void*)&RawAppDatalen,sizeof(RawAppDatalen));
+    memcpy(TLVappDataBuf+sizeof(appDataTag)+sizeof(RawAppDatalen),(void *)RawAppDataBuf,RawAppDatalen);
     totallen = sizeof(appDataTag)+sizeof(RawAppDatalen)+RawAppDatalen;
     return 0;
 }

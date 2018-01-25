@@ -47,7 +47,7 @@
 
 #define   ERR_DEBUG_SWITCH        1
 #ifdef    ERR_DEBUG_SWITCH
-#define UART_Err(fmt,args...) printf(RED "[UART][ERROR] " NONE "\nFile:<%s> Fun:[%s] Line:%d\n "fmt, __FILE__, __FUNCTION__, __LINE__, ##args)
+#define UART_Err(fmt,args...) printf(RED "[UART][ERROR] " NONE "\nFile:<%s> Fun:[%s] Line:%d\n " fmt, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
 #define UART_Err(fmt,args...) /*do nothing */
 #endif
@@ -57,6 +57,7 @@
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
+#define NOTEST
 const int FramLenMax=256;
 static serial* g_serialCom;
 static MsgQueue* g_MsgQueue;
@@ -96,7 +97,7 @@ union U_Tag{
 
 struct S_TLV{
     U_Tag tag;
-    unsigned short len;
+    unsigned char len;
     unsigned char* value;
 };
 

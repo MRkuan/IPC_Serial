@@ -32,7 +32,7 @@ int taskManager::serialComInit(){
     if(g_serialCom==NULL){
         g_serialCom = getSerialCom();
     }
-    ret = g_serialCom->Open("COM4",115200,8,NO,1);
+    ret = g_serialCom->Open("/dev/tty.usbserial",115200,8,NO,1);
     if(ret==0)
         UART_Dbg("ERROR open serial com failed");
     else
@@ -62,7 +62,7 @@ void* taskManager::taskRecvSerialMsg(void *arg){
             pTaskMngr->mDataLinkLayerProcessor.splitDLFrame(rawData,rawLength);
         }
 #ifdef NOTEST
-        usleep(10*1000);//10ms
+        usleep(50*1000);//50ms
 #else
         sleep(5);
 #endif
@@ -115,7 +115,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
             pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData+1,dataLen-1);//TP
         }
 #ifdef NOTEST
-        usleep(5*1000);//10ms
+        usleep(10*1000);//10ms
 #else
         sleep(2);
 #endif

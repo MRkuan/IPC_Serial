@@ -24,9 +24,10 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
     memcpy(rawbuf,(void*)&m_Ack,sizeof(m_Ack));
     rawbuf[sizeof(m_Ack)]=fcs;
 
-    mCOBStool.StuffData(rawbuf,len,encodedBuf+1);
-    encodedBuf[0]=Frame_Head_Tail_Send;
+    mCOBStool.StuffData(rawbuf,++len,encodedBuf+1);//cobs转译后长度+1
+    encodedBuf[1]--;
     len+=2;
+    encodedBuf[0]=Frame_Head_Tail_Send;
     encodedBuf[len-1]=Frame_Head_Tail_Send;
     if(len>0){
         UART_Dbg("\nreplyACK is :");
