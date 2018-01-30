@@ -58,6 +58,7 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
         UART_Dbg("[error]multiTLVs with error length\n");
         return -1;
     }
+    return 0;
 }
 
 int TLVtools::singleTLVSendProcessor(U_Tag appDataTag,unsigned short RawAppDatalen,unsigned char* RawAppDataBuf,unsigned char* TLVappDataBuf,unsigned short &totallen){

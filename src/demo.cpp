@@ -42,8 +42,6 @@ int main(){
     for(int i =0;i<len-1;i++){
         printf("0x%02x ",testRawData2[i]);
     }
-
-
 }
 
 

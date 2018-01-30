@@ -11,7 +11,137 @@ TransportLayer::~TransportLayer()
 {
 
 }
+void TransportLayer::sendMultiTLV2MCUtest(){
+    U_PacketHeader ph;
+    S_TLV tlv[2];
+    unsigned char value[3]={0x11,0x22,0x33};
+    unsigned char value2[5]={0x44,0x55,0x66,0x77,0x88};
+    ph.Packet_Header.PT=0;
+    ph.Packet_Header.CID=1;
+    ph.Packet_Header.SN=2;
+    ph.Packet_Header.Reserved=0;
+    ph.Packet_Header.LENapp=(sizeof(tlv[0].tag)+1)*2+3+5;
 
+    tlv[0].tag.Tag.BusinessType=4;
+    tlv[0].tag.Tag.BusinessSub1Type=5;
+    tlv[0].tag.Tag.BusinessSub2Type=6;
+    tlv[0].len=3;
+    tlv[0].value=value;
+
+    tlv[1].tag.Tag.BusinessType=7;
+    tlv[1].tag.Tag.BusinessSub1Type=8;
+    tlv[1].tag.Tag.BusinessSub2Type=9;
+    tlv[1].len=5;
+    tlv[1].value=value2;
+    sendMultiTLV2MCU(ph,tlv,2);
+}
+
+void TransportLayer::sendSingleTLV2MCUtest(){
+    U_PacketHeader ph;
+    S_TLV tlv;
+    unsigned char value[3]={0x11,0x22,0x33};
+    ph.Packet_Header.PT=0;
+    ph.Packet_Header.CID=1;
+    ph.Packet_Header.SN=2;
+    ph.Packet_Header.Reserved=0;
+    ph.Packet_Header.LENapp=sizeof(tlv.tag)+1+3;
+    tlv.tag.Tag.BusinessType=4;
+    tlv.tag.Tag.BusinessSub1Type=5;
+    tlv.tag.Tag.BusinessSub2Type=6;
+    tlv.len=3;
+    tlv.value=value;
+    sendSingleTLV2MCU(ph,tlv);
+}
+void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLVCount){
+    unsigned char fcs;
+    unsigned char rawbuf[FramLenMax];
+    unsigned char encodedBuf[FramLenMax];
+    unsigned int totalLen=0;
+    unsigned int index=0;
+
+    for(int i =0;i<TLVCount;i++){
+        totalLen=totalLen+sizeof(m_tlv[i].tag)+sizeof(m_tlv[i].len)+m_tlv[i].len;
+    }
+    totalLen=totalLen+sizeof(U_PacketHeader)+4;//4:head+tail+fcs+COBS转译差位
+    if(totalLen>FramLenMax)
+    {
+        UART_Err("[sendMultiTLV2MCU] length error len:%d\n",totalLen);
+        return ;
+    }
+
+    memcpy(rawbuf,(void* )&m_ph,sizeof(m_ph));
+    index+=sizeof(m_ph);
+    for(int i=0;i<TLVCount;i++){
+        memcpy(rawbuf+index,(void *)&(m_tlv[i].tag),sizeof(m_tlv[i].tag));
+        index+=sizeof(m_tlv[i].tag);
+        rawbuf[index]=m_tlv[i].len;
+        index+=sizeof(m_tlv[i].len);
+        memcpy(rawbuf+index,m_tlv[i].value,m_tlv[i].len);
+        index+=m_tlv[i].len;
+    }
+
+    fcs = GetFCS_8(rawbuf,index);
+    rawbuf[index++]=fcs;
+    mCOBStool.StuffData(rawbuf,index,encodedBuf+1);
+    index+=3;//add head tail COBS转译后长度+1
+    encodedBuf[0]=Frame_Head_Tail_Send;
+    encodedBuf[index-1]=Frame_Head_Tail_Send;
+    if(index!=totalLen)
+        UART_Err("[sendMultiTLV2MCU] length error totalLen:%d,index:%d\n",totalLen,index);
+    if(index>0){
+        UART_Dbg("sendMultiTLV2MCU is :");
+        for(int i =0;i<index;i++){
+            printf("0x%02x ",encodedBuf[i]);
+        }
+        printf("\n");
+    }
+    g_serialCom->Write(encodedBuf,index);
+    UART_Dbg("[end]sendMultiTLV2MCU \n");
+    return;
+
+}
+void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
+    unsigned char fcs;
+    unsigned char rawbuf[FramLenMax];
+    unsigned char encodedBuf[FramLenMax];
+    unsigned int totalLen;
+    unsigned int index=0;
+
+    totalLen=sizeof(U_PacketHeader)+sizeof(m_tlv.tag)+sizeof(m_tlv.len)+m_tlv.len+4;//4:head+tail+fcs+COBS转译差位
+    if(totalLen>FramLenMax)
+    {
+        UART_Err("[sendSingleTLV2MCU] length error len=%d\n",totalLen);
+        return ;
+    }
+
+    memcpy(rawbuf,(void* )&m_ph,sizeof(m_ph));
+    index+=sizeof(m_ph);
+    memcpy(rawbuf+index,(void *)&(m_tlv.tag),sizeof(m_tlv.tag));
+    index+=sizeof(m_tlv.tag);
+    rawbuf[index]=m_tlv.len;
+    index+=sizeof(m_tlv.len);
+    memcpy(rawbuf+index,m_tlv.value,m_tlv.len);
+    index+=m_tlv.len;
+    fcs = GetFCS_8(rawbuf,index);
+    rawbuf[index++]=fcs;
+    mCOBStool.StuffData(rawbuf,index,encodedBuf+1);
+    index+=3;//add head tail COBS转译后长度+1
+    encodedBuf[0]=Frame_Head_Tail_Send;
+    encodedBuf[index-1]=Frame_Head_Tail_Send;
+    if(index!=totalLen)
+        UART_Err("[sendSingleTLV2MCU] length error totalLen:%d,index:%d\n",totalLen,index);
+    if(index>0){
+        UART_Dbg("sendSingleTLV2MCU is :");
+        for(int i =0;i<index;i++){
+            printf("0x%02x ",encodedBuf[i]);
+        }
+        printf("\n");
+    }
+    g_serialCom->Write(encodedBuf,index);
+    UART_Dbg("[end]sendSingleTLV2MCU \n");
+    return;
+
+}
 
 void TransportLayer::replyACK(U_ACKpacket m_Ack){
     unsigned char fcs;
@@ -68,6 +198,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         }
         memcpy(appDataBuff,buf+sizeof(U_PacketHeader),uph.Packet_Header.LENapp);
         mTLVtools.singleTLVRevProcessor(appDataBuff,uph.Packet_Header.LENapp);
+
         //reply ACK
         U_ACKpacket m_Ack;
         m_Ack.ACK_Packet.PT=ACK;
@@ -98,13 +229,15 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     case MNA_Multi_TLV://包含多个业务类(表现为多个TLV字段)的重要数据，需发送方回复ACK; LENapp>0;
         memcpy(appDataBuff,buf+sizeof(U_PacketHeader),uph.Packet_Header.LENapp);
         ret = mTLVtools.multiTLVRecvProcessor(appDataBuff,uph.Packet_Header.LENapp);
-        if(!ret){
+        if(ret){
             //[todo] add error reply
         }else{
             U_ACKpacket m_Ack;
             m_Ack.ACK_Packet.PT=ACK;
             m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
             m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
+            m_Ack.ACK_Packet.ET=0;
+            m_Ack.ACK_Packet.RWS=100;
             UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
             replyACK(m_Ack);
         }

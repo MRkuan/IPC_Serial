@@ -57,7 +57,7 @@
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
-#define NOTEST
+//#define NOTEST
 const int FramLenMax=256;
 static serial* g_serialCom;
 static MsgQueue* g_MsgQueue;

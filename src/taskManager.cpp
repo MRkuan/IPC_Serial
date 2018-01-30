@@ -86,23 +86,17 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 
     while(TRUE)
     {
+
         msgQueueLength = g_MsgQueue->Queuelength();
 //        UART_Dbg("[--] taskProcessSerialMsg queueLen=%d\n",msgQueueLength);
         if(msgQueueLength){
             g_MsgQueue->Dequeue(rawData,dataLen);
-//                        UART_Dbg("RawData is:");
-//                        for(int i =0;i<dataLen;i++){
-//                            printf("0x%02x ",rawData[i]);
-//                        }
+//            UART_Dbg("RawData is:");for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}
             //去除数据首尾的Frame_Header和Frame_Tail，数据形式是:Packet_Header+APP_Data+FCS
             dataLen-=2;//（head tail） 剩余为有效长度
             pTaskMngr->mCOBStool.UnStuffData(rawData+1,dataLen,DecodedData);
             dataLen--;//COBS源码比转译后编码短1
-                        UART_Dbg("DecodedData is:");
-                        for(int i =0;i<dataLen;i++){
-                            printf("0x%02x ",DecodedData[i]);
-                        }
-                        printf("\n");
+            UART_Dbg("DecodedData is:");for(int i =0;i<dataLen;i++){printf("0x%02x ",DecodedData[i]);}printf("\n");
 
             //check CRC
             caculateFCS = GetFCS_8(DecodedData,dataLen-1);
@@ -115,6 +109,14 @@ void* taskManager::taskProcessSerialMsg(void *arg){
             //[todo] analyse and solve data
             pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData,dataLen-1);//TP
         }
+//        UART_Dbg("[start]sendSingleTLV2MCUtest\n");
+//        pTaskMngr->mTransportLayerProcessor.sendSingleTLV2MCUtest();//test sendSingleTLV2MCUtest
+
+//        UART_Dbg("[start]sendMultiTLV2MCUtest\n");
+//        pTaskMngr->mTransportLayerProcessor.sendMultiTLV2MCUtest();//test sendMultiTLV2MCUtest
+
+
+
 #ifdef NOTEST
         usleep(10*1000);//10ms
 #else
