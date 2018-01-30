@@ -54,7 +54,7 @@ void* taskManager::taskRecvSerialMsg(void *arg){
     while(TRUE){
         rawLength = g_serialCom->Read(rawData);
         if(rawLength>0){
-            UART_Dbg("\nrawData is :");
+            UART_Dbg("rawData is:");
             for(int i =0;i<rawLength;i++){
                 printf("0x%02x ",rawData[i]);
             }
@@ -90,29 +90,30 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 //        UART_Dbg("[--] taskProcessSerialMsg queueLen=%d\n",msgQueueLength);
         if(msgQueueLength){
             g_MsgQueue->Dequeue(rawData,dataLen);
-            //            UART_Dbg("\nRawData is:");
-            //            for(int i =0;i<dataLen;i++){
-            //                printf("0x%02x ",rawData[i]);
-            //            }
-            pTaskMngr->mCOBStool.UnStuffData(rawData,dataLen,DecodedData);
-                        UART_Dbg("\nDecodedData is:");
+//                        UART_Dbg("RawData is:");
+//                        for(int i =0;i<dataLen;i++){
+//                            printf("0x%02x ",rawData[i]);
+//                        }
+            //去除数据首尾的Frame_Header和Frame_Tail，数据形式是:Packet_Header+APP_Data+FCS
+            dataLen-=2;//（head tail） 剩余为有效长度
+            pTaskMngr->mCOBStool.UnStuffData(rawData+1,dataLen,DecodedData);
+            dataLen--;//COBS源码比转译后编码短1
+                        UART_Dbg("DecodedData is:");
                         for(int i =0;i<dataLen;i++){
                             printf("0x%02x ",DecodedData[i]);
                         }
                         printf("\n");
-            //去除数据首尾的Frame_Header和Frame_Tail，数据形式是:Packet_Header+APP_Data+FCS
-            //            DecodedData++;
-            dataLen-=2;
+
             //check CRC
-            caculateFCS = GetFCS_8(DecodedData+1,dataLen-1);
-            if(caculateFCS == DecodedData[dataLen]){
-                UART_Dbg("CRC1:0x%x CRC2:0x%x is correct \n",caculateFCS,DecodedData[dataLen]);
+            caculateFCS = GetFCS_8(DecodedData,dataLen-1);
+            if(caculateFCS == DecodedData[dataLen-1]){
+                UART_Dbg("CRC1:0x%x CRC2:0x%x is correct \n",caculateFCS,DecodedData[dataLen-1]);
             }else{
-                UART_Err(" CRC error CRC1:0x%x CRC2:0x%x \n",caculateFCS,DecodedData[dataLen]);
+                UART_Err(" CRC error CRC1:0x%x CRC2:0x%x \n",caculateFCS,DecodedData[dataLen-1]);
                 //[todo] add error method
             }
             //[todo] analyse and solve data
-            pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData+1,dataLen-1);//TP
+            pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData,dataLen-1);//TP
         }
 #ifdef NOTEST
         usleep(10*1000);//10ms

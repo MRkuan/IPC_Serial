@@ -22,15 +22,14 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
     fcs = GetFCS_8((unsigned char *)&m_Ack,sizeof(m_Ack));
     len=sizeof(m_Ack)+sizeof(fcs);
     memcpy(rawbuf,(void*)&m_Ack,sizeof(m_Ack));
-    rawbuf[sizeof(m_Ack)]=fcs;
+    rawbuf[len-1]=fcs;
 
     mCOBStool.StuffData(rawbuf,++len,encodedBuf+1);//cobs转译后长度+1
-    encodedBuf[1]--;
     len+=2;
     encodedBuf[0]=Frame_Head_Tail_Send;
     encodedBuf[len-1]=Frame_Head_Tail_Send;
     if(len>0){
-        UART_Dbg("\nreplyACK is :");
+        UART_Dbg("replyACK is :");
         for(int i =0;i<len;i++){
             printf("0x%02x ",encodedBuf[i]);
         }
@@ -51,7 +50,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_PacketHeader uph;
     static unsigned char appDataBuff[FramLenMax];
     int ret;
-    UART_Dbg("\nAnalyseData is :");
+    UART_Dbg("AnalyseData is :");
     for(int i =0;i<datalen;i++){
         printf("0x%02x ",buf[i]);
     }
@@ -74,6 +73,8 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         m_Ack.ACK_Packet.PT=ACK;
         m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
         m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
+        m_Ack.ACK_Packet.ET=0;
+        m_Ack.ACK_Packet.RWS=100;
         UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
         replyACK(m_Ack);
         break;

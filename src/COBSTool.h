@@ -1,7 +1,7 @@
 #ifndef COBSTOOL_H
 #define COBSTOOL_H
 
-#define FinishBlock(X) (*code_ptr = (X),code_ptr = dst++,code = 0x01 )
+
 
 class COBSTool
 {

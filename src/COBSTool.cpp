@@ -1,5 +1,5 @@
 #include "COBSTool.h"
-
+#define FinishBlock(X) (*code_ptr = (X),code_ptr = dst++,code = 0x01 )
 COBSTool::COBSTool()
 {
 
@@ -41,7 +41,6 @@ void COBSTool::StuffData(const unsigned char *ptr, unsigned long length,unsigned
     }
     FinishBlock(code);
 }
-
 
 /**
  * @brief UnStuffData 解码

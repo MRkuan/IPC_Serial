@@ -32,9 +32,9 @@ void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
             headTailCout++;
             if(needRecombine&&(1==headTailCout)){//需与上一包组包
                 needRecombine=0;
-                tailIndex = i;
-                memcpy(mediaBuf+mediaBufIndex,buf,tailIndex+1);
-                mediaBufIndex+=(tailIndex+1);
+                tailIndex = i+1;
+                memcpy(mediaBuf+mediaBufIndex,buf,tailIndex);
+                mediaBufIndex+=(tailIndex);
                 //将mediaBuf中数据enqueue到队列中,长度为mediaBufIndex
                 g_MsgQueue->Enqueue(mediaBuf,mediaBufIndex);
                 headTailCout=0;
@@ -47,7 +47,7 @@ void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
                     headTailCout--;
                 }
                 else{
-                    tailIndex = i;
+                    tailIndex = i+1;
                     memcpy(mediaBuf,buf+headIndex,tailIndex-headIndex);//headIndex到i之间就是一组数据
                     //将mediaBuf中数据enqueue到队列中,长度为tailIndex-headIndex
                     g_MsgQueue->Enqueue(mediaBuf,tailIndex-headIndex);

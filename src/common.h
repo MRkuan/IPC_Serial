@@ -53,7 +53,7 @@
 #endif
 
 
-#define Frame_Head_Tail_Send 0xff
+#define Frame_Head_Tail_Send 0x00
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
