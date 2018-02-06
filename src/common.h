@@ -61,8 +61,10 @@
 const int FramLenMax=256;
 static serial* g_serialCom;
 static MsgQueue* g_MsgQueueRecv;
+static MsgQueue* g_MsgQueueSend;
 static unsigned char g_SN=0;
 const unsigned char max_SN = 64;
+static int g_clientRWS=100;
 union U_PacketHeader{
     struct{
         unsigned int LENapp:12;  //20~31
@@ -132,7 +134,8 @@ unsigned char GetFCS_8(unsigned char *pbuf, unsigned int len);
 
 serial* getSerialCom();
 
-MsgQueue* getMsgQueue();
+MsgQueue* getMsgQueueRecv();
 
+MsgQueue* getMsgQueueSend();
 unsigned char getSN();
 #endif	//__COMMON_H

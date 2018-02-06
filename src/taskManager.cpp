@@ -14,7 +14,10 @@ taskManager::taskManager()
 {
 
     if(g_MsgQueueRecv==NULL){
-        g_MsgQueueRecv = getMsgQueue();
+        g_MsgQueueRecv = getMsgQueueRecv();
+    }
+    if(g_MsgQueueSend==NULL){
+        g_MsgQueueSend = getMsgQueueSend();
     }
 }
 
@@ -110,7 +113,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
             pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData,dataLen-1);//TP
         }
 //        UART_Dbg("[start]sendSingleTLV2MCUtest\n");
-//        pTaskMngr->mTransportLayerProcessor.sendSingleTLV2MCUtest();//test sendSingleTLV2MCUtest
+        pTaskMngr->mTransportLayerProcessor.sendSingleTLV2MCUtest();//test sendSingleTLV2MCUtest
 
 //        UART_Dbg("[start]sendMultiTLV2MCUtest\n");
 //        pTaskMngr->mTransportLayerProcessor.sendMultiTLV2MCUtest();//test sendMultiTLV2MCUtest
@@ -118,7 +121,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 
 
 #ifdef NOTEST
-        usleep(500*1000);//10ms
+        usleep(50*1000);//ms
 #else
         sleep(2);
 #endif
@@ -126,6 +129,37 @@ void* taskManager::taskProcessSerialMsg(void *arg){
     }
 
 }
+
+void* taskManager::taskSendSerialMsg(void *arg){
+    unsigned char rawData[FramLenMax];
+    int dataLen;
+    int msgQueueLength;
+    int ret;
+    UART_Dbg("[start] taskSendSerialMsg\n");
+
+    while(TRUE)
+    {
+        //判断对方接受区是否已经满了
+        if(g_clientRWS<1) continue;
+        msgQueueLength = g_MsgQueueSend->Queuelength();
+//        UART_Dbg("[--] taskSendSerialMsg queueLen=%d\n",msgQueueLength);
+        if(msgQueueLength){
+            g_MsgQueueSend->Dequeue(rawData,dataLen);
+            UART_Dbg("Queue[%d] SendData is:",msgQueueLength);for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}printf("\n");
+            ret = g_serialCom->Write(rawData,dataLen);
+            if(!ret) UART_Err("[taskSendSerialMsg] send data error!\n");
+        }
+
+
+#ifdef NOTEST
+        usleep(10*1000);//ms
+#else
+        sleep(2);
+#endif
+
+    }
+}
+
 
 void taskManager::start(){
     int ret=-1;
@@ -139,6 +173,8 @@ void taskManager::start(){
     if(ret) UART_Err("[Error] start taskRecvSerialMsg failed\n");
     ret = pthread_create(&serialProcessor, NULL,taskProcessSerialMsg, this);
     if(ret) UART_Err("[Error] start taskProcessSerialMsg failed\n");//若成功则返回0，否则返回出错编号
+    ret = pthread_create(&serialSend, NULL,taskSendSerialMsg, this);
+    if(ret) UART_Err("[Error] start taskSendSerialMsg failed\n");
     pthread_join(serialProcessor,NULL);
 
 

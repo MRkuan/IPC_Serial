@@ -70,12 +70,19 @@ serial* getSerialCom(){
     return g_serialCom;
 }
 
-MsgQueue* getMsgQueue(){
+MsgQueue* getMsgQueueRecv(){
     if(g_MsgQueueRecv==NULL){
         g_MsgQueueRecv = new MsgQueue();
     }
     return g_MsgQueueRecv;
 }
+MsgQueue* getMsgQueueSend(){
+    if(g_MsgQueueSend==NULL){
+        g_MsgQueueSend = new MsgQueue();
+    }
+    return g_MsgQueueSend;
+}
+
 unsigned char getSN(){
     g_SN = g_SN%max_SN;
     return g_SN++;

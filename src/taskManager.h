@@ -22,6 +22,7 @@ public:
     int serialComInit();
     static void* taskRecvSerialMsg(void *);
     static void* taskProcessSerialMsg(void *);
+    static void* taskSendSerialMsg(void *);
     void start();
 
 private:
@@ -29,6 +30,7 @@ private:
 
     pthread_t serialRecv;
     pthread_t serialProcessor;
+    pthread_t serialSend;
     DataLinkLayer mDataLinkLayerProcessor;
     TransportLayer mTransportLayerProcessor;
     COBSTool mCOBStool;

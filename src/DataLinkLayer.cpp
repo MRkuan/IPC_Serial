@@ -4,7 +4,7 @@ extern MsgQueue* m_MsgQueue;
 DataLinkLayer::DataLinkLayer()
 {
     if(g_MsgQueueRecv==NULL){
-        g_MsgQueueRecv = getMsgQueue();
+        g_MsgQueueRecv = getMsgQueueRecv();
     }
 }
 

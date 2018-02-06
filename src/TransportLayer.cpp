@@ -6,7 +6,10 @@ TransportLayer::TransportLayer()
         g_serialCom = getSerialCom();
     }
     if(g_MsgQueueRecv==NULL){
-        g_MsgQueueRecv = getMsgQueue();
+        g_MsgQueueRecv = getMsgQueueRecv();
+    }
+    if(g_MsgQueueSend==NULL){
+        g_MsgQueueSend = getMsgQueueSend();
     }
 }
 
@@ -98,7 +101,7 @@ void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLV
         }
         printf("\n");
     }
-    g_serialCom->Write(encodedBuf,index);
+    g_MsgQueueSend->Enqueue(encodedBuf,index);
     UART_Dbg("[end]sendMultiTLV2MCU \n");
     return;
 
@@ -133,15 +136,15 @@ void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
     encodedBuf[index-1]=Frame_Head_Tail_Send;
     if(index!=totalLen)
         UART_Err("[sendSingleTLV2MCU] length error totalLen:%d,index:%d\n",totalLen,index);
-    if(index>0){
-        UART_Dbg("sendSingleTLV2MCU is :");
-        for(int i =0;i<index;i++){
-            printf("0x%02x ",encodedBuf[i]);
-        }
-        printf("\n");
-    }
-    g_serialCom->Write(encodedBuf,index);
-    UART_Dbg("[end]sendSingleTLV2MCU \n");
+//    if(index>0){
+//        UART_Dbg("sendSingleTLV2MCU is :\n");
+//        for(int i =0;i<index;i++){
+//            printf("0x%02x ",encodedBuf[i]);
+//        }
+//        printf("\n");
+//    }
+    g_MsgQueueSend->Enqueue(encodedBuf,index);
+//    UART_Dbg("[end]sendSingleTLV2MCU \n");
     return;
 
 }
@@ -168,7 +171,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
         }
         printf("\n");
     }
-    g_serialCom->Write(encodedBuf,len);
+    g_MsgQueueSend->Enqueue(encodedBuf,len);
     UART_Dbg("[end]replyACK \n");
 }
 
@@ -181,7 +184,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
  */
 void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_PacketHeader uph;
-//    U_ACKpacket * pUAckPh;
+    U_ACKpacket * pUAckPh;
     static unsigned char appDataBuff[FramLenMax];
     int ret;
     UART_Dbg("AnalyseData is :");
@@ -229,10 +232,9 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
 
     case ACK://应答；Packet_Header后没有内容，即整个TP_PACKET就只包含Packet_Header，没有APP_DATA;此时的Packet Header组成会有一定改变
         UART_Dbg("recv ack\n");
-        //        pUAckPh = (U_ACKpacket *)&uph;
-//        UART_Dbg("[ACK] RWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
-
-
+        pUAckPh = (U_ACKpacket *)&uph;
+        UART_Dbg("[ACK] RWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
+        g_clientRWS = pUAckPh->ACK_Packet.RWS;
         break;
     case Reserved1://预留
         break;
