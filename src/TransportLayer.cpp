@@ -5,6 +5,9 @@ TransportLayer::TransportLayer()
     if(g_serialCom==NULL){
         g_serialCom = getSerialCom();
     }
+    if(g_MsgQueueRecv==NULL){
+        g_MsgQueueRecv = getMsgQueue();
+    }
 }
 
 TransportLayer::~TransportLayer()
@@ -178,6 +181,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
  */
 void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_PacketHeader uph;
+//    U_ACKpacket * pUAckPh;
     static unsigned char appDataBuff[FramLenMax];
     int ret;
     UART_Dbg("AnalyseData is :");
@@ -194,8 +198,9 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_ACKpacket m_Ack;
     m_Ack.ACK_Packet.PT=ACK;
     m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
-    m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
-    m_Ack.ACK_Packet.RWS=100-g_MsgQueue->Queuelength();
+    m_Ack.ACK_Packet.ACK_SN = getSN();
+    m_Ack.ACK_Packet.RWS=100-g_MsgQueueRecv->Queuelength();
+
     switch(uph.Packet_Header.PT){
     case MNA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)的重要数据；需接收方回复ACK或流控消息; LENapp>0;
         if(datalen!=(uph.Packet_Header.LENapp+sizeof(U_PacketHeader)))
@@ -223,7 +228,11 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         break;
 
     case ACK://应答；Packet_Header后没有内容，即整个TP_PACKET就只包含Packet_Header，没有APP_DATA;此时的Packet Header组成会有一定改变
-        UART_Dbg("Recv ACK\n");
+        UART_Dbg("recv ack\n");
+        //        pUAckPh = (U_ACKpacket *)&uph;
+//        UART_Dbg("[ACK] RWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
+
+
         break;
     case Reserved1://预留
         break;

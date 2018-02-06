@@ -71,10 +71,10 @@ serial* getSerialCom(){
 }
 
 MsgQueue* getMsgQueue(){
-    if(g_MsgQueue==NULL){
-        g_MsgQueue = new MsgQueue();
+    if(g_MsgQueueRecv==NULL){
+        g_MsgQueueRecv = new MsgQueue();
     }
-    return g_MsgQueue;
+    return g_MsgQueueRecv;
 }
 unsigned char getSN(){
     g_SN = g_SN%max_SN;

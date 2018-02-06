@@ -57,10 +57,10 @@
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
-//#define NOTEST
+#define NOTEST
 const int FramLenMax=256;
 static serial* g_serialCom;
-static MsgQueue* g_MsgQueue;
+static MsgQueue* g_MsgQueueRecv;
 static unsigned char g_SN=0;
 const unsigned char max_SN = 64;
 union U_PacketHeader{

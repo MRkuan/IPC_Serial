@@ -9,12 +9,12 @@
 #include "taskManager.h"
 #include "unistd.h"
 extern serial* g_serialCom;
-extern MsgQueue* g_MsgQueue;
+extern MsgQueue* g_MsgQueueRecv;
 taskManager::taskManager()
 {
 
-    if(g_MsgQueue==NULL){
-        g_MsgQueue = getMsgQueue();
+    if(g_MsgQueueRecv==NULL){
+        g_MsgQueueRecv = getMsgQueue();
     }
 }
 
@@ -87,10 +87,10 @@ void* taskManager::taskProcessSerialMsg(void *arg){
     while(TRUE)
     {
 
-        msgQueueLength = g_MsgQueue->Queuelength();
+        msgQueueLength = g_MsgQueueRecv->Queuelength();
 //        UART_Dbg("[--] taskProcessSerialMsg queueLen=%d\n",msgQueueLength);
         if(msgQueueLength){
-            g_MsgQueue->Dequeue(rawData,dataLen);
+            g_MsgQueueRecv->Dequeue(rawData,dataLen);
 //            UART_Dbg("RawData is:");for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}
             //去除数据首尾的Frame_Header和Frame_Tail，数据形式是:Packet_Header+APP_Data+FCS
             dataLen-=2;//（head tail） 剩余为有效长度
@@ -118,7 +118,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 
 
 #ifdef NOTEST
-        usleep(10*1000);//10ms
+        usleep(500*1000);//10ms
 #else
         sleep(2);
 #endif
