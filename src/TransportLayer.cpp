@@ -245,7 +245,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     case MNDA_Multi_TLV://包含多个业务类(表现为多个TLV字段)的不重要数据; LENapp>0;
         memcpy(appDataBuff,buf+sizeof(U_PacketHeader),uph.Packet_Header.LENapp);
         ret = mTLVtools.multiTLVRecvProcessor(appDataBuff,uph.Packet_Header.LENapp);
-        if(!ret){
+        if(ret){
             //[todo] add error reply
         }
         break;
