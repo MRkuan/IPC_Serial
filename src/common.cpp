@@ -76,3 +76,7 @@ MsgQueue* getMsgQueue(){
     }
     return g_MsgQueue;
 }
+unsigned char getSN(){
+    g_SN = g_SN%max_SN;
+    return g_SN++;
+}

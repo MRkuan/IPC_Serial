@@ -18,7 +18,7 @@ void TransportLayer::sendMultiTLV2MCUtest(){
     unsigned char value2[5]={0x44,0x55,0x66,0x77,0x88};
     ph.Packet_Header.PT=0;
     ph.Packet_Header.CID=1;
-    ph.Packet_Header.SN=2;
+    ph.Packet_Header.SN=getSN();
     ph.Packet_Header.Reserved=0;
     ph.Packet_Header.LENapp=(sizeof(tlv[0].tag)+1)*2+3+5;
 
@@ -42,7 +42,7 @@ void TransportLayer::sendSingleTLV2MCUtest(){
     unsigned char value[3]={0x11,0x22,0x33};
     ph.Packet_Header.PT=0;
     ph.Packet_Header.CID=1;
-    ph.Packet_Header.SN=2;
+    ph.Packet_Header.SN=getSN();
     ph.Packet_Header.Reserved=0;
     ph.Packet_Header.LENapp=sizeof(tlv.tag)+1+3;
     tlv.tag.Tag.BusinessType=4;
@@ -188,7 +188,14 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
 
     //analyse Packet_Header
     memcpy((void*)&uph,buf,sizeof(U_PacketHeader));
-    UART_Dbg("PT:%d\n",uph.Packet_Header.PT);
+    UART_Dbg("PT:%d,CID:%d SN:%d \n",uph.Packet_Header.PT,uph.Packet_Header.CID,uph.Packet_Header.SN);
+
+    //reply ACK
+    U_ACKpacket m_Ack;
+    m_Ack.ACK_Packet.PT=ACK;
+    m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
+    m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
+    m_Ack.ACK_Packet.RWS=100-g_MsgQueue->Queuelength();
     switch(uph.Packet_Header.PT){
     case MNA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)的重要数据；需接收方回复ACK或流控消息; LENapp>0;
         if(datalen!=(uph.Packet_Header.LENapp+sizeof(U_PacketHeader)))
@@ -198,14 +205,8 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         }
         memcpy(appDataBuff,buf+sizeof(U_PacketHeader),uph.Packet_Header.LENapp);
         mTLVtools.singleTLVRevProcessor(appDataBuff,uph.Packet_Header.LENapp);
-
-        //reply ACK
-        U_ACKpacket m_Ack;
-        m_Ack.ACK_Packet.PT=ACK;
-        m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
-        m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
         m_Ack.ACK_Packet.ET=0;
-        m_Ack.ACK_Packet.RWS=100;
+
         UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
         replyACK(m_Ack);
         break;
@@ -232,12 +233,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         if(ret){
             //[todo] add error reply
         }else{
-            U_ACKpacket m_Ack;
-            m_Ack.ACK_Packet.PT=ACK;
-            m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
-            m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
             m_Ack.ACK_Packet.ET=0;
-            m_Ack.ACK_Packet.RWS=100;
             UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
             replyACK(m_Ack);
         }
