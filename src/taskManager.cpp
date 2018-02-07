@@ -97,6 +97,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 //            UART_Dbg("RawData is:");for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}
             //去除数据首尾的Frame_Header和Frame_Tail，数据形式是:Packet_Header+APP_Data+FCS
             dataLen-=2;//（head tail） 剩余为有效长度
+            if(dataLen<2) continue;//防止短数据导致程序异常，如：0x00 0x01 0x00
             pTaskMngr->mCOBStool.UnStuffData(rawData+1,dataLen,DecodedData);
             dataLen--;//COBS源码比转译后编码短1
             UART_Dbg("DecodedData is:");for(int i =0;i<dataLen;i++){printf("0x%02x ",DecodedData[i]);}printf("\n");
