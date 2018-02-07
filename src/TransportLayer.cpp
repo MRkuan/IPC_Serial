@@ -202,7 +202,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     m_Ack.ACK_Packet.PT=ACK;
     m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
     m_Ack.ACK_Packet.ACK_SN = getSN();
-    m_Ack.ACK_Packet.RWS=100-g_MsgQueueRecv->Queuelength();
+    m_Ack.ACK_Packet.RWS=g_MsgQueueRecv->getQueueRWS();
 
     switch(uph.Packet_Header.PT){
     case MNA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)的重要数据；需接收方回复ACK或流控消息; LENapp>0;

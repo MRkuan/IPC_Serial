@@ -17,16 +17,19 @@ public:
     int Enqueue(unsigned char* buf,int datalength);
     int Dequeue(unsigned char* buf,int& datalength);
     int Queuelength();
-    MsgQueue();
-    ~MsgQueue();
+    int getQueueRWS();
+    explicit MsgQueue(unsigned int m_maxQueueLen);
+
 
 private:
-
+    MsgQueue();
+    ~MsgQueue();
     typedef struct _Queue_Station{
         unsigned char * basedata;
         int basedatalength;
     }Queue_Station;
     std::queue < Queue_Station * > Qstation;
+    unsigned int maxQueueLength;
 
 };
 

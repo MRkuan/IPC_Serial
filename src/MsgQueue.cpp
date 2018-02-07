@@ -17,14 +17,21 @@ MsgQueue::~MsgQueue()
 {
 
 }
+MsgQueue::MsgQueue(unsigned int m_maxQueueLen){
+    maxQueueLength = m_maxQueueLen;
+}
 
 /**
  * @brief MsgQueue::Enqueue
  * @param buf
  * @param datalength
- * @return
+ * @return 0:ok -1:error
  */
 int MsgQueue::Enqueue(unsigned char* buf,int datalength){
+    if(Qstation.size()>=maxQueueLength) {
+        UART_Err("Queue is full\n");
+        return -1;
+    }
     Queue_Station * pQueue=new(Queue_Station);
     pQueue->basedata=(unsigned char*)malloc(FramLenMax);
     pQueue->basedatalength=datalength;
@@ -41,7 +48,7 @@ int MsgQueue::Enqueue(unsigned char* buf,int datalength){
  */
 int MsgQueue::Dequeue(unsigned char* buf,int& datalength){
 
-    if(Qstation.empty()) return 0;
+    if(Qstation.empty()) return -1;
     Queue_Station * pQueue = Qstation.front();
     memcpy(buf,pQueue->basedata,pQueue->basedatalength);
     datalength=pQueue->basedatalength;
@@ -55,3 +62,6 @@ int MsgQueue::Queuelength(){
     return Qstation.size();
 }
 
+int MsgQueue::getQueueRWS(){
+    return maxQueueLength-Qstation.size();
+}

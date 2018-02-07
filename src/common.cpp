@@ -72,13 +72,13 @@ serial* getSerialCom(){
 
 MsgQueue* getMsgQueueRecv(){
     if(g_MsgQueueRecv==NULL){
-        g_MsgQueueRecv = new MsgQueue();
+        g_MsgQueueRecv = new MsgQueue(MaxQueueLen);
     }
     return g_MsgQueueRecv;
 }
 MsgQueue* getMsgQueueSend(){
     if(g_MsgQueueSend==NULL){
-        g_MsgQueueSend = new MsgQueue();
+        g_MsgQueueSend = new MsgQueue(MaxQueueLen);
     }
     return g_MsgQueueSend;
 }

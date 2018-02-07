@@ -65,6 +65,7 @@ static MsgQueue* g_MsgQueueSend;
 static unsigned char g_SN=0;
 const unsigned char max_SN = 64;
 static int g_clientRWS=100;
+const unsigned int MaxQueueLen=100;
 union U_PacketHeader{
     struct{
         unsigned int LENapp:12;  //20~31
