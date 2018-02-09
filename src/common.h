@@ -8,7 +8,8 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
-//#include <linux/input.h>
+#include <semaphore.h>
+#include <time.h>
 #include "MsgQueue.h"
 #include "serial.h"
 
@@ -52,20 +53,27 @@
 #define UART_Err(fmt,args...) /*do nothing */
 #endif
 
-
+#define UNUSED(x) (void)(x)
 #define Frame_Head_Tail_Send 0x00
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
+//Nanoseconds [0 .. 999999999]
+#define NSECTOSEC    1000000000
 #define NOTEST
 const int FramLenMax=256;
-static serial* g_serialCom;
-static MsgQueue* g_MsgQueueRecv;
-static MsgQueue* g_MsgQueueSend;
-static unsigned char g_SN=0;
 const unsigned char max_SN = 64;
-static int g_clientRWS=100;
 const unsigned int MaxQueueLen=100;
+const unsigned int nano_sec = 80*1000;
+
+__attribute__((unused)) static serial* g_serialCom;
+__attribute__((unused)) static MsgQueue* g_MsgQueueRecv;
+__attribute__((unused)) static MsgQueue* g_MsgQueueSend;
+__attribute__((unused)) static unsigned char g_SN=0;
+__attribute__((unused)) static int g_clientRWS=100;
+__attribute__((unused)) static sem_t g_semaphore;
+
+
 union U_PacketHeader{
     struct{
         unsigned int LENapp:12;  //20~31
@@ -139,4 +147,7 @@ MsgQueue* getMsgQueueRecv();
 
 MsgQueue* getMsgQueueSend();
 unsigned char getSN();
+unsigned int getClientRWS();
+void setClientRWS(unsigned int rws);
+
 #endif	//__COMMON_H

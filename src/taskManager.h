@@ -14,6 +14,7 @@
 #include "DataLinkLayer.h"
 #include "TransportLayer.h"
 #include <pthread.h>
+
 class taskManager
 {
 public:
@@ -24,6 +25,7 @@ public:
     static void* taskProcessSerialMsg(void *);
     static void* taskSendSerialMsg(void *);
     void start();
+    void initSystem();
 
 private:
 

@@ -87,3 +87,9 @@ unsigned char getSN(){
     g_SN = g_SN%max_SN;
     return g_SN++;
 }
+unsigned int getClientRWS(){
+    return g_clientRWS;
+}
+void setClientRWS(unsigned int rws){
+    g_clientRWS=rws;
+}

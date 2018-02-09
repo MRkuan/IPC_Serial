@@ -94,14 +94,23 @@ void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLV
     encodedBuf[index-1]=Frame_Head_Tail_Send;
     if(index!=totalLen)
         UART_Err("[sendMultiTLV2MCU] length error totalLen:%d,index:%d\n",totalLen,index);
-    if(index>0){
-        UART_Dbg("sendMultiTLV2MCU is :");
-        for(int i =0;i<index;i++){
-            printf("0x%02x ",encodedBuf[i]);
-        }
-        printf("\n");
+    //最后附加一位表示是否需要等待ACK，供发送进程taskSendSerialMsg作是否等待ACK的判断依据
+    switch(m_ph.Packet_Header.PT){
+    case MNA_Single_TLV:
+    case MNA_Multi_TLV:
+        encodedBuf[index]=1;
+        break;
+    default:
+        encodedBuf[index]=0;
     }
-    g_MsgQueueSend->Enqueue(encodedBuf,index);
+//    if(index>0){
+//        UART_Dbg("sendMultiTLV2MCU is :");
+//        for(unsigned int i =0;i<index;i++){
+//            printf("0x%02x ",encodedBuf[i]);
+//        }
+//        printf("\n");
+//    }
+    g_MsgQueueSend->Enqueue(encodedBuf,index+1);
     UART_Dbg("[end]sendMultiTLV2MCU \n");
     return;
 
@@ -136,6 +145,15 @@ void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
     encodedBuf[index-1]=Frame_Head_Tail_Send;
     if(index!=totalLen)
         UART_Err("[sendSingleTLV2MCU] length error totalLen:%d,index:%d\n",totalLen,index);
+    //最后附加一位表示是否需要等待ACK，供发送进程taskSendSerialMsg作是否等待ACK的判断依据
+    switch(m_ph.Packet_Header.PT){
+    case MNA_Single_TLV:
+    case MNA_Multi_TLV:
+        encodedBuf[index]=1;
+        break;
+    default:
+        encodedBuf[index]=0;
+    }
 //    if(index>0){
 //        UART_Dbg("sendSingleTLV2MCU is :\n");
 //        for(int i =0;i<index;i++){
@@ -143,7 +161,7 @@ void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
 //        }
 //        printf("\n");
 //    }
-    g_MsgQueueSend->Enqueue(encodedBuf,index);
+    g_MsgQueueSend->Enqueue(encodedBuf,index+1);
 //    UART_Dbg("[end]sendSingleTLV2MCU \n");
     return;
 
@@ -166,7 +184,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
     encodedBuf[len-1]=Frame_Head_Tail_Send;
     if(len>0){
         UART_Dbg("replyACK is :");
-        for(int i =0;i<len;i++){
+        for(unsigned int i =0;i<len;i++){
             printf("0x%02x ",encodedBuf[i]);
         }
         printf("\n");
@@ -188,7 +206,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     static unsigned char appDataBuff[FramLenMax];
     int ret;
     UART_Dbg("AnalyseData is :");
-    for(int i =0;i<datalen;i++){
+    for(unsigned int i =0;i<datalen;i++){
         printf("0x%02x ",buf[i]);
     }
     printf("\n");
@@ -234,7 +252,8 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         UART_Dbg("recv ack\n");
         pUAckPh = (U_ACKpacket *)&uph;
         UART_Dbg("[ACK] RWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
-        g_clientRWS = pUAckPh->ACK_Packet.RWS;
+        setClientRWS(pUAckPh->ACK_Packet.RWS);
+        if (sem_post(&g_semaphore) == -1) UART_Err("sem_post() failed\n");
         break;
     case Reserved1://预留
         break;

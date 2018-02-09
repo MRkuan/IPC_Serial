@@ -8,6 +8,7 @@
 
 #include "taskManager.h"
 #include "unistd.h"
+#include "common.h"
 extern serial* g_serialCom;
 extern MsgQueue* g_MsgQueueRecv;
 taskManager::taskManager()
@@ -32,10 +33,11 @@ taskManager::~taskManager()
  */
 int taskManager::serialComInit(){
     char ret=-1;
+    char portName[]={"/dev/tty.usbserial"};
     if(g_serialCom==NULL){
         g_serialCom = getSerialCom();
     }
-    ret = g_serialCom->Open("/dev/tty.usbserial",115200,8,NO,'1');
+    ret = g_serialCom->Open(portName,115200,8,NO,1);
     if(ret==0)
         UART_Dbg("ERROR open serial com failed");
     else
@@ -122,7 +124,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 
 
 #ifdef NOTEST
-        usleep(50*1000);//ms
+        usleep(600*1000);//ms
 #else
         sleep(2);
 #endif
@@ -136,31 +138,59 @@ void* taskManager::taskSendSerialMsg(void *arg){
     int dataLen;
     int msgQueueLength;
     int ret;
+    int clientRWS;
+    struct timespec ts;
+    bool waitACK=false;
+    unsigned sleepTime=100*1000;//ms
     UART_Dbg("[start] taskSendSerialMsg\n");
+    UNUSED(arg);
 
     while(TRUE)
     {
-        //判断对方接受区是否已经满了
-        if(g_clientRWS<1) continue;
+        if(waitACK){//等待同步信号
+            //设置等待时间为80ms
+            if (clock_gettime( CLOCK_REALTIME,&ts ) < 0 ){
+                usleep(sleepTime);
+                UART_Err("clock_gettime failed\n");
+                continue;
+            }
+            ts.tv_nsec += nano_sec;ts.tv_sec += ts.tv_nsec/NSECTOSEC;ts.tv_nsec = ts.tv_nsec%NSECTOSEC;
+            ret = sem_timedwait(&g_semaphore,&ts);
+            if (ret == -1) {//超时处理
+                if (errno == ETIMEDOUT)
+                    UART_Err("sem_timedwait() timed out\n");
+                else
+                    perror("sem_timedwait");
+                usleep(sleepTime);//ms
+                //[todo]重新请求数据
+                continue;
+            }
+            //收到同步信号
+            //判断对方接受区是否已经满了
+            clientRWS=getClientRWS();
+            if(clientRWS<1) continue;
+        }else{
+            usleep(sleepTime);
+        }
         msgQueueLength = g_MsgQueueSend->Queuelength();
 //        UART_Dbg("[--] taskSendSerialMsg queueLen=%d\n",msgQueueLength);
         if(msgQueueLength){
             g_MsgQueueSend->Dequeue(rawData,dataLen);
-            UART_Dbg("Queue[%d] SendData is:",msgQueueLength);for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}printf("\n");
-            ret = g_serialCom->Write(rawData,dataLen);
+            waitACK=rawData[dataLen-1];
+            UART_Dbg("RWS[%d] Queue[%d] SendData is:",clientRWS,msgQueueLength);for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}printf("\n");
+            ret = g_serialCom->Write(rawData,dataLen-1);
             if(!ret) UART_Err("[taskSendSerialMsg] send data error!\n");
+            //判断发送出去的消息是否需要等待ACK，需要的话则等待
         }
-
-
-#ifdef NOTEST
-        usleep(10*1000);//ms
-#else
-        sleep(2);
-#endif
 
     }
 }
 
+void taskManager::initSystem(){
+    int ret=-1;
+    ret = sem_init(&g_semaphore,0,0);//If pshared has the value 0, then the semaphore is shared between the threads of a process
+    if(ret) UART_Err("[Error] sem_init failed\n");
+}
 
 void taskManager::start(){
     int ret=-1;
