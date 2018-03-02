@@ -25,7 +25,8 @@ SOURCES += \
     src/MsgQueue.cpp \
     src/common.cpp \
     src/serial.cpp \
-    src/timeout.cpp
+    src/timeout.cpp \
+    src/Msg2MCUhandler.cpp
 
 HEADERS += \
     src/common.h \
@@ -36,4 +37,5 @@ HEADERS += \
     src/COBSTool.h \
     src/MsgQueue.h \
     src/serial.h \
-    src/timeout.h
+    src/timeout.h \
+    src/Msg2MCUhandler.h

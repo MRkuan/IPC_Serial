@@ -1,5 +1,4 @@
 #include "TLVtools.h"
-
 TLVtools::TLVtools()
 {
 
@@ -21,11 +20,8 @@ int TLVtools::singleTLVRevProcessor(unsigned char* appDataBuff,unsigned short to
         UART_Dbg("[error]single TLV with error totallen%d TLVlen:%d\n",totallen,mTLV.len);
         return -1;
     }
-    UART_Dbg("APP DataContent is :");
-    for(int i =0;i<mTLV.len;i++){
-        printf("0x%02x ",mTLV.value[i]);
-    }
-    printf("\n");
+    UART_Dbg("APP DataContent is :");for(int i =0;i<mTLV.len;i++){printf("0x%02x ",mTLV.value[i]);}printf("\n");
+    TLVTable((unsigned short )mTLV.tag.Tag.BusinessType,(unsigned short )mTLV.tag.Tag.BusinessSub1Type,(unsigned short )mTLV.tag.Tag.BusinessSub2Type,(unsigned short )mTLV.len,mTLV.value);
     return 0;
 }
 
@@ -61,13 +57,59 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
     return 0;
 }
 
-int TLVtools::singleTLVSendProcessor(U_Tag appDataTag,unsigned short RawAppDatalen,unsigned char* RawAppDataBuf,unsigned char* TLVappDataBuf,unsigned short &totallen){
-
-    memcpy((void*)TLVappDataBuf,(void*)&appDataTag,sizeof(appDataTag));
-    memcpy(TLVappDataBuf+sizeof(appDataTag),(void*)&RawAppDatalen,sizeof(RawAppDatalen));
-    memcpy(TLVappDataBuf+sizeof(appDataTag)+sizeof(RawAppDatalen),(void *)RawAppDataBuf,RawAppDatalen);
-    totallen = sizeof(appDataTag)+sizeof(RawAppDatalen)+RawAppDatalen;
-    return 0;
+void TLVtools::TLVTable(unsigned short tag1,unsigned short tag2,unsigned short tag3,unsigned char len,unsigned char* dataValue){
+    UART_Dbg("[TLVTable] TLVinfo tag:%d tag1:%d tag2:%d len:%d \n",tag1,tag2,tag3,len);
+    for(int i =0;i<len;i++) printf("0x%x ",dataValue[i]);printf("\n");
+    switch(tag1){
+    case 0x0:
+        switch (tag2) {
+        case 0:
+            switch (tag3) {
+            case 0:
+            case 1:
+                break;
+            default:
+                break;
+            }
+        case 1:
+        case 2:
+        case 3:
+            break;
+        default:
+            break;
+        }
+    case 0x1:
+    case 0x2:
+        switch (tag2) {
+        case 0:
+            switch (tag3) {
+            case 0:
+            case 1:
+                break;
+            default:
+                break;
+            }
+        case 1:
+        case 2:
+        case 3:
+        case 0x10:
+            switch (tag3) {
+            case 0:
+                UART_Dbg("[TLVTable2]TLVinfo tag:0x%x tag1:0x%x tag2:0x%x len:%d \n",tag1,tag2,tag3,len);
+                break;
+            case 1:
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    case 0x3:
+        break;
+    default:
+        break;
+    }
 }
-
 

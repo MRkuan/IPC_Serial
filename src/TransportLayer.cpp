@@ -11,6 +11,9 @@ TransportLayer::TransportLayer()
     if(g_MsgQueueSend==NULL){
         g_MsgQueueSend = getMsgQueueSend();
     }
+    if(g_semaphore==NULL){
+        g_semaphore = getSemaphore();
+    }
 }
 
 TransportLayer::~TransportLayer()
@@ -182,6 +185,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
     len+=2;
     encodedBuf[0]=Frame_Head_Tail_Send;
     encodedBuf[len-1]=Frame_Head_Tail_Send;
+    encodedBuf[len]=0;  //最后附加一位表示是否需要等待ACK，供发送进程taskSendSerialMsg作是否等待ACK的判断依据
     if(len>0){
         UART_Dbg("replyACK is :");
         for(unsigned int i =0;i<len;i++){
@@ -189,7 +193,7 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
         }
         printf("\n");
     }
-    g_MsgQueueSend->Enqueue(encodedBuf,len);
+    g_MsgQueueSend->Enqueue(encodedBuf,len+1);
     UART_Dbg("[end]replyACK \n");
 }
 
@@ -219,8 +223,8 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_ACKpacket m_Ack;
     m_Ack.ACK_Packet.PT=ACK;
     m_Ack.ACK_Packet.CID = uph.Packet_Header.CID;
-    m_Ack.ACK_Packet.ACK_SN = getSN();
-    m_Ack.ACK_Packet.RWS=g_MsgQueueRecv->getQueueRWS();
+    m_Ack.ACK_Packet.ACK_SN = uph.Packet_Header.SN;
+    m_Ack.ACK_Packet.RWS=g_MsgQueueRecv->getQueueRWS()-1;
 
     switch(uph.Packet_Header.PT){
     case MNA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)的重要数据；需接收方回复ACK或流控消息; LENapp>0;
@@ -233,7 +237,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
         mTLVtools.singleTLVRevProcessor(appDataBuff,uph.Packet_Header.LENapp);
         m_Ack.ACK_Packet.ET=0;
 
-        UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
+        UART_Dbg("ACKinfo PT:%d CID:%d SN:%d myRWS:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN,m_Ack.ACK_Packet.RWS);
         replyACK(m_Ack);
         break;
 
@@ -251,9 +255,9 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     case ACK://应答；Packet_Header后没有内容，即整个TP_PACKET就只包含Packet_Header，没有APP_DATA;此时的Packet Header组成会有一定改变
         UART_Dbg("recv ack\n");
         pUAckPh = (U_ACKpacket *)&uph;
-        UART_Dbg("[ACK] RWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
+        UART_Dbg("[ACK] ClientRWS:%d ACK_SN:%d ET:%d \n",pUAckPh->ACK_Packet.RWS,pUAckPh->ACK_Packet.ACK_SN,pUAckPh->ACK_Packet.ET);
         setClientRWS(pUAckPh->ACK_Packet.RWS);
-        if (sem_post(&g_semaphore) == -1) UART_Err("sem_post() failed\n");
+        if (sem_post(g_semaphore) == -1) UART_Err("sem_post() failed\n");
         break;
     case Reserved1://预留
         break;
@@ -264,7 +268,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
             //[todo] add error reply
         }else{
             m_Ack.ACK_Packet.ET=0;
-            UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN);
+            UART_Dbg("ACKinfo PT:%d CID:%d SN:%d\n myRWS:%d\n",m_Ack.ACK_Packet.PT,m_Ack.ACK_Packet.CID,m_Ack.ACK_Packet.ACK_SN,m_Ack.ACK_Packet.RWS);
             replyACK(m_Ack);
         }
         break;

@@ -63,15 +63,15 @@
 #define NOTEST
 const int FramLenMax=256;
 const unsigned char max_SN = 64;
-const unsigned int MaxQueueLen=100;
-const unsigned int nano_sec = 80*1000;
+const unsigned int MaxQueueLen=20;
+const unsigned int nano_sec = 60*1000*1000;
 
 __attribute__((unused)) static serial* g_serialCom;
 __attribute__((unused)) static MsgQueue* g_MsgQueueRecv;
 __attribute__((unused)) static MsgQueue* g_MsgQueueSend;
 __attribute__((unused)) static unsigned char g_SN=0;
 __attribute__((unused)) static int g_clientRWS=100;
-__attribute__((unused)) static sem_t g_semaphore;
+__attribute__((unused)) static sem_t* g_semaphore;
 
 
 union U_PacketHeader{
@@ -146,8 +146,14 @@ serial* getSerialCom();
 MsgQueue* getMsgQueueRecv();
 
 MsgQueue* getMsgQueueSend();
+
+sem_t* getSemaphore();
+
 unsigned char getSN();
+
 unsigned int getClientRWS();
+
 void setClientRWS(unsigned int rws);
+
 
 #endif	//__COMMON_H
