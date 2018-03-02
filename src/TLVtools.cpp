@@ -8,7 +8,13 @@ TLVtools::~TLVtools()
 {
 
 }
-
+/**
+ * @brief TLVtools::singleTLVRevProcessor
+ * @param appDataBuff 数据地址
+ * @param totallen 数据长度
+ * 解析接收到的单包TLV
+ * @return
+ */
 int TLVtools::singleTLVRevProcessor(unsigned char* appDataBuff,unsigned short totallen){
     S_TLV mTLV;
     memcpy((char*)&(mTLV.tag),appDataBuff,sizeof(mTLV.tag));
@@ -25,6 +31,13 @@ int TLVtools::singleTLVRevProcessor(unsigned char* appDataBuff,unsigned short to
     return 0;
 }
 
+/**
+ * @brief TLVtools::multiTLVRecvProcessor
+ * @param appDataBuff 数据地址
+ * @param totallen 数据长度
+ * 解析接收到的多包TLV
+ * @return
+ */
 int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short totallen){
     S_TLV mTLV;
     unsigned short processedLen;
@@ -56,7 +69,15 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
     }
     return 0;
 }
-
+/**
+ * @brief TLVtools::TLVTable
+ * @param tag1
+ * @param tag2
+ * @param tag3
+ * @param len
+ * @param dataValue
+ * TLV消息详细定义表
+ */
 void TLVtools::TLVTable(unsigned short tag1,unsigned short tag2,unsigned short tag3,unsigned char len,unsigned char* dataValue){
     UART_Dbg("[TLVTable] TLVinfo tag:%d tag1:%d tag2:%d len:%d \n",tag1,tag2,tag3,len);
     for(int i =0;i<len;i++) printf("0x%x ",dataValue[i]);printf("\n");

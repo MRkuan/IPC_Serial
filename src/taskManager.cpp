@@ -114,7 +114,6 @@ void* taskManager::taskProcessSerialMsg(void *arg){
                 UART_Err(" CRC error CRC1:0x%x CRC2:0x%x \n",caculateFCS,DecodedData[dataLen-1]);
                 //[todo] add error method
             }
-            //[todo] analyse and solve data
             pTaskMngr->mTransportLayerProcessor.splitTPData(DecodedData,dataLen-1);//TP
         }
 #ifdef NOTEST
@@ -126,7 +125,14 @@ void* taskManager::taskProcessSerialMsg(void *arg){
     }
     return NULL;
 }
-
+/**
+ * @brief taskManager::taskSendSerialMsg
+ * @param arg
+ * 发送数据进程，对数据进行统一发送管理
+ * 发送时看该数据是否需要ACK，如果需要ACK则等待ACK，如果等待超时则重发该数据，最多重发两次
+ * 发送前判断对方接受区RWS是否还有空间，如果没有空间了则暂时不发送，一直等到RWS不为0，再发送数据
+ * @return
+ */
 void* taskManager::taskSendSerialMsg(void *arg){
     unsigned char rawData[FramLenMax];
     int dataLen;
@@ -190,6 +196,12 @@ void* taskManager::taskSendSerialMsg(void *arg){
     return NULL;
 }
 
+/**
+ * @brief taskManager::taskSerialTest
+ * @param arg
+ * 测试线程，用于调试时进行数据发送测试
+ * @return
+ */
 void* taskManager::taskSerialTest(void *arg){//用于发送测试命令
      taskManager* pTaskMngr = (taskManager*)arg;
      Msg2MCUhandler* p_Msg2MCUhandler;
@@ -216,21 +228,30 @@ void* taskManager::taskSerialTest(void *arg){//用于发送测试命令
      }
      return NULL;
 }
-
+/**
+ * @brief taskManager::initSystem
+ * 初始化系统
+ */
 void taskManager::initSystem(){
     int ret=-1;
-    ret = sem_init(g_semaphore,0,0);//If pshared has the value 0, then the semaphore is shared between the threads of a process
-    if(ret) UART_Err("[Error] sem_init failed\n");
-}
-
-void taskManager::start(){
-    int ret=-1;
+    //初始化串口
     ret = serialComInit();
     while(!ret){
         UART_Err("[Error] serialComInit failed\n");
         sleep(1);
         ret = serialComInit();
     }
+    //初始化同步信号量
+    ret = sem_init(g_semaphore,0,0);//If pshared has the value 0, then the semaphore is shared between the threads of a process
+    if(ret) UART_Err("[Error] sem_init failed\n");
+}
+/**
+ * @brief taskManager::start
+ * 创建线程
+ */
+void taskManager::start(){
+    int ret=-1;
+    initSystem();
     ret = pthread_create(&serialRecv, NULL,taskRecvSerialMsg, this);
     if(ret) UART_Err("[Error] start taskRecvSerialMsg failed\n");
     ret = pthread_create(&serialProcessor, NULL,taskProcessSerialMsg, this);

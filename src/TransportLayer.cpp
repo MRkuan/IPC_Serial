@@ -20,6 +20,10 @@ TransportLayer::~TransportLayer()
 {
 
 }
+/**
+ * @brief TransportLayer::sendMultiTLV2MCUtest
+ * 发送多TLV消息测试
+ */
 void TransportLayer::sendMultiTLV2MCUtest(){
     U_PacketHeader ph;
     S_TLV tlv[2];
@@ -45,6 +49,10 @@ void TransportLayer::sendMultiTLV2MCUtest(){
     sendMultiTLV2MCU(ph,tlv,2);
 }
 
+/**
+ * @brief TransportLayer::sendSingleTLV2MCUtest
+ * 发送单TLV消息测试
+ */
 void TransportLayer::sendSingleTLV2MCUtest(){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -61,6 +69,14 @@ void TransportLayer::sendSingleTLV2MCUtest(){
     tlv.value=value;
     sendSingleTLV2MCU(ph,tlv);
 }
+
+/**
+ * @brief TransportLayer::sendMultiTLV2MCU
+ * @param m_ph
+ * @param m_tlv
+ * @param TLVCount
+ * 发送多TLV消息接口
+ */
 void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLVCount){
     unsigned char fcs;
     unsigned char rawbuf[FramLenMax];
@@ -118,6 +134,13 @@ void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLV
     return;
 
 }
+
+/**
+ * @brief TransportLayer::sendSingleTLV2MCU
+ * @param m_ph
+ * @param m_tlv
+ * 发送单TLV消息接口
+ */
 void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
     unsigned char fcs;
     unsigned char rawbuf[FramLenMax];

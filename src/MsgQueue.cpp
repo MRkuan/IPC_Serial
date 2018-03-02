@@ -61,7 +61,11 @@ int MsgQueue::Dequeue(unsigned char* buf,int& datalength){
 int MsgQueue::Queuelength(){
     return Qstation.size();
 }
-
+/**
+ * @brief MsgQueue::getQueueRWS
+ * 获取队列还能存放多少消息
+ * @return
+ */
 int MsgQueue::getQueueRWS(){
     return maxQueueLength-Qstation.size();
 }
