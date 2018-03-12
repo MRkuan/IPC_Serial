@@ -5,6 +5,9 @@
 
 #include "common.h"
 #include "Msg2MCUhandler.h"
+
+
+
 class SerialServer: public QObject
 {
     Q_OBJECT
@@ -21,7 +24,7 @@ public slots:
     bool setAirConditionerInfo(unsigned short arg1,unsigned short arg2,unsigned short arg3);
     bool setStartInfo(unsigned char arg1);
 signals:
-    void boradcastCANInfo(QString& arg1);
+    void broadcastCANInfo(QByteArray candata,unsigned char len);
 
 private:
     Msg2MCUhandler mMsg2MCUhandler;

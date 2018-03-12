@@ -148,7 +148,7 @@ void* taskManager::taskSendSerialMsg(void *arg){
 
     while(TRUE)
     {
-#if 0
+#if 1
         if(waitACK){//等待同步信号
 #else
         if(0){//不等待同步信号

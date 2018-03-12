@@ -1,4 +1,5 @@
 #include "TLVtools.h"
+#include "SerialServer.h"
 TLVtools::TLVtools()
 {
 
@@ -79,6 +80,8 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
  * TLV消息详细定义表
  */
 void TLVtools::TLVTable(unsigned short tag1,unsigned short tag2,unsigned short tag3,unsigned char len,unsigned char* dataValue){
+    SerialServer mSerialServer;
+    QByteArray RawData(QByteArray::fromRawData((char *)dataValue, len));
     UART_Dbg("[TLVTable] TLVinfo tag:%d tag1:%d tag2:%d len:%d \n",tag1,tag2,tag3,len);
     for(int i =0;i<len;i++) printf("0x%x ",dataValue[i]);printf("\n");
     switch(tag1){
@@ -117,6 +120,7 @@ void TLVtools::TLVTable(unsigned short tag1,unsigned short tag2,unsigned short t
             switch (tag3) {
             case 0:
                 UART_Dbg("[TLVTable2]TLVinfo tag:0x%x tag1:0x%x tag2:0x%x len:%d \n",tag1,tag2,tag3,len);
+                mSerialServer.broadcastCANInfo(RawData,len);
                 break;
             case 1:
                 break;
