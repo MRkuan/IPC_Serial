@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core dbus
 
 QT       -= gui
 
@@ -26,7 +26,8 @@ SOURCES += \
     src/common.cpp \
     src/serial.cpp \
     src/timeout.cpp \
-    src/Msg2MCUhandler.cpp
+    src/Msg2MCUhandler.cpp \
+    src/SerialServer.cpp
 
 HEADERS += \
     src/common.h \
@@ -38,4 +39,5 @@ HEADERS += \
     src/MsgQueue.h \
     src/serial.h \
     src/timeout.h \
-    src/Msg2MCUhandler.h
+    src/Msg2MCUhandler.h \
+    src/SerialServer.h

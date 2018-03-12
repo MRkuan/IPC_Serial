@@ -14,7 +14,7 @@
 #include "DataLinkLayer.h"
 #include "TransportLayer.h"
 #include <pthread.h>
-
+#include "SerialServer.h"
 class taskManager
 {
 public:
@@ -38,6 +38,7 @@ private:
     DataLinkLayer mDataLinkLayerProcessor;
     TransportLayer mTransportLayerProcessor;
     COBSTool mCOBStool;
+
 };
 
 #endif // taskManager_H

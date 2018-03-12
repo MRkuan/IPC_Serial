@@ -148,21 +148,25 @@ void* taskManager::taskSendSerialMsg(void *arg){
 
     while(TRUE)
     {
+#if 0
         if(waitACK){//等待同步信号
+#else
+        if(0){//不等待同步信号
+#endif
             //设置等待时间
             if (clock_gettime( CLOCK_REALTIME,&ts ) < 0 ){
                 usleep(sleepTime);UART_Err("clock_gettime failed\n");continue;
             }
             ts.tv_nsec += nano_sec;ts.tv_sec += ts.tv_nsec/NSECTOSEC;ts.tv_nsec = ts.tv_nsec%NSECTOSEC;
             ret = sem_timedwait(g_semaphore,&ts);
-            if (ret == -1&&resendTimes++<2) {//add resend//超时处理 重发三次
-                if (errno == ETIMEDOUT){
+            if (ret == -1) {
+                if (errno == ETIMEDOUT&&resendTimes++<2){//超时处理 重发三次
                     UART_Err("sem_timedwait() timed out reSendtimes[%d] clientRWS[%d] Queue[%d]  Data is:",resendTimes,clientRWS,msgQueueLength);for(int i =0;i<dataLen;i++){printf("0x%02x ",rawData[i]);}printf("\n");
                     ret = g_serialCom->Write(rawData,dataLen-1);
                     if(!ret) UART_Err("[taskSendSerialMsg] resend data error!\n");
                 }
-                else
-                    perror("sem_timedwait");
+//                else
+//                    perror("sem_timedwait");
                 usleep(sleepTime);//ms
                 //[todo]重新请求数据
                 continue;
@@ -214,16 +218,16 @@ void* taskManager::taskSerialTest(void *arg){//用于发送测试命令
         pTaskMngr->mTransportLayerProcessor.sendMultiTLV2MCUtest();//test sendMultiTLV2MCUtest
         sleep(4);
         UART_Dbg("\n-------------------------\n[start]sendDoorInfo\n-------------------------\n");
-        p_Msg2MCUhandler->sendDoorInfo();
+        p_Msg2MCUhandler->sendDoorInfo(1,2);
         sleep(4);
         UART_Dbg("\n-------------------------\n[start]sendLampInfo\n-------------------------\n");
-        p_Msg2MCUhandler->sendLampInfo();
+        p_Msg2MCUhandler->sendLampInfo(1,2);
         sleep(4);
         UART_Dbg("\n-------------------------\n[start]sendKeyInfo\n-------------------------\n");
-        p_Msg2MCUhandler->sendKeyInfo();
+        p_Msg2MCUhandler->sendKeyInfo(1,2);
         sleep(4);
         UART_Dbg("\n-------------------------\n[start]sendSpeedInfo\n-------------------------\n");
-        p_Msg2MCUhandler->sendSpeedInfo();
+        p_Msg2MCUhandler->sendSpeedInfo(1,2,3);
         sleep(4);
      }
      return NULL;
@@ -244,6 +248,9 @@ void taskManager::initSystem(){
     //初始化同步信号量
     ret = sem_init(g_semaphore,0,0);//If pshared has the value 0, then the semaphore is shared between the threads of a process
     if(ret) UART_Err("[Error] sem_init failed\n");
+
+
+
 }
 /**
  * @brief taskManager::start
@@ -258,9 +265,9 @@ void taskManager::start(){
     if(ret) UART_Err("[Error] start taskProcessSerialMsg failed\n");//若成功则返回0，否则返回出错编号
     ret = pthread_create(&serialSend, NULL,taskSendSerialMsg, this);
     if(ret) UART_Err("[Error] start taskSendSerialMsg failed\n");
-    ret = pthread_create(&serialTest, NULL,taskSerialTest, this);
-    if(ret) UART_Err("[Error] start taskSerialTest failed\n");
-    pthread_join(serialProcessor,NULL);
+//    ret = pthread_create(&serialTest, NULL,taskSerialTest, this);
+//    if(ret) UART_Err("[Error] start taskSerialTest failed\n");
+//    pthread_join(serialProcessor,NULL);
 
 
 }
