@@ -253,7 +253,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     case MNA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)的重要数据；需接收方回复ACK或流控消息; LENapp>0;
         if(datalen!=(uph.Packet_Header.LENapp+sizeof(U_PacketHeader)))
         {
-            UART_Err("[MNA] length error,recv datalen:%d,theoretical len:%ld\n",datalen,uph.Packet_Header.LENapp+sizeof(U_PacketHeader));
+            UART_Err("[MNA] length error,recv datalen:%d,theoretical len:%d\n",datalen,uph.Packet_Header.LENapp+sizeof(U_PacketHeader));
             break;
         }
         memcpy(appDataBuff,buf+sizeof(U_PacketHeader),uph.Packet_Header.LENapp);
@@ -267,7 +267,7 @@ void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     case MNDA_Single_TLV://仅包含单个业务类(表现为只有1个TLV字段)非重要数据；无需接收方回复ACK或流控消息; LENapp>0;
         if(datalen!=(uph.Packet_Header.LENapp+sizeof(U_PacketHeader)))
         {
-            UART_Err("[MNDA] length error,recv datalen:%d,theoretical len:%ld\n",datalen,uph.Packet_Header.LENapp+sizeof(U_PacketHeader));
+            UART_Err("[MNDA] length error,recv datalen:%d,theoretical len:%d\n",datalen,uph.Packet_Header.LENapp+sizeof(U_PacketHeader));
             break;
         }
         //[todo]
