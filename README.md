@@ -14,3 +14,5 @@ moc SerialServer.h > moc_SerialServer.cpp
 
 或者将上面步骤qmake生成的moc_SerialServer.cpp文件拷贝过来使用，也可以
 
+## UML类图叠加分层设计
+![image](http://www.fanjiafei.cn/wp-content/uploads/2018/03/Overview-of-Design-Model-of-IPC-2.jpg)
