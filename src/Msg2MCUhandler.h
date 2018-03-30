@@ -1,3 +1,14 @@
+/**
+
+* @file       Msg2MCUhandler.h
+
+* @brief      处理发送给MCU的消息
+
+* @details    封装外部发送给MCU的消息，提供接口供发送函数调用
+
+* @author     Albert
+
+*/
 #ifndef MSG2MCUHANDLER_H
 #define MSG2MCUHANDLER_H
 #include "common.h"

@@ -23,9 +23,12 @@ MsgQueue::MsgQueue(unsigned int m_maxQueueLen){
 
 /**
  * @brief MsgQueue::Enqueue
- * @param buf
- * @param datalength
+ * @details 入队
+ * @param buf 待入队数据首地址
+ * @param datalength 待入队数据长度
  * @return 0:ok -1:error
+ * @retval 0 success
+ * @retval -1 failed
  */
 int MsgQueue::Enqueue(unsigned char* buf,int datalength){
     if(Qstation.size()>=maxQueueLength) {
@@ -42,8 +45,9 @@ int MsgQueue::Enqueue(unsigned char* buf,int datalength){
 
 /**
  * @brief MsgQueue::Dequeue
- * @param buf
- * @param datalength
+ * @details 出队
+ * @param buf 出队后数据存放位置首地址
+ * @param datalength 出队的数据长度
  * @return
  */
 int MsgQueue::Dequeue(unsigned char* buf,int& datalength){
@@ -57,13 +61,17 @@ int MsgQueue::Dequeue(unsigned char* buf,int& datalength){
     Qstation.pop();
     return 0;
 }
-
+/**
+ * @brief MsgQueue::Queuelength
+ * @details 获取队列长度
+ * @return
+ */
 int MsgQueue::Queuelength(){
     return Qstation.size();
 }
 /**
  * @brief MsgQueue::getQueueRWS
- * 获取队列还能存放多少消息
+ * @details 获取队列还能存放多少消息
  * @return
  */
 int MsgQueue::getQueueRWS(){

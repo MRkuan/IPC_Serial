@@ -1,3 +1,14 @@
+/**
+
+* @file       COBSTool.h
+
+* @brief      COBS转译类.
+
+* @details 对COBS转译进行封装.
+
+* @author     Albert
+
+*/
 #ifndef COBSTOOL_H
 #define COBSTOOL_H
 

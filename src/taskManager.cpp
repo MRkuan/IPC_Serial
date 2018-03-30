@@ -33,7 +33,7 @@ taskManager::~taskManager()
 
 /**
  * @brief taskManager::serialComInit
- * 初始化串口，设置波特率、停止位、校验位等参数
+ * @details 初始化串口，设置波特率、停止位、校验位等参数
  */
 int taskManager::serialComInit(){
     char ret=-1;
@@ -51,7 +51,7 @@ int taskManager::serialComInit(){
 
 /**
  * @brief taskManager::taskRecvSerialMsg
- * 1、从串口接收数据
+ * @details 1、从串口接收数据
  * 2、对数据进行拼包,将数据入msgQueue
  */
 void* taskManager::taskRecvSerialMsg(void *arg){
@@ -81,7 +81,7 @@ void* taskManager::taskRecvSerialMsg(void *arg){
 
 /**
  * @brief taskManager::taskProcessSerialMsg
- * 1、从msgQueue取数据
+ * @details1、从msgQueue取数据
  * 2、对数据进行COBS解码
  */
 void* taskManager::taskProcessSerialMsg(void *arg){
@@ -128,7 +128,7 @@ void* taskManager::taskProcessSerialMsg(void *arg){
 /**
  * @brief taskManager::taskSendSerialMsg
  * @param arg
- * 发送数据进程，对数据进行统一发送管理
+ * @details 发送数据进程，对数据进行统一发送管理
  * 发送时看该数据是否需要ACK，如果需要ACK则等待ACK，如果等待超时则重发该数据，最多重发两次
  * 发送前判断对方接受区RWS是否还有空间，如果没有空间了则暂时不发送，一直等到RWS不为0，再发送数据
  * @return
@@ -203,7 +203,7 @@ void* taskManager::taskSendSerialMsg(void *arg){
 /**
  * @brief taskManager::taskSerialTest
  * @param arg
- * 测试线程，用于调试时进行数据发送测试
+ * @details 测试线程，用于调试时进行数据发送测试
  * @return
  */
 void* taskManager::taskSerialTest(void *arg){//用于发送测试命令
@@ -234,7 +234,7 @@ void* taskManager::taskSerialTest(void *arg){//用于发送测试命令
 }
 /**
  * @brief taskManager::initSystem
- * 初始化系统
+ * @details 初始化系统
  */
 void taskManager::initSystem(){
     int ret=-1;
@@ -254,7 +254,7 @@ void taskManager::initSystem(){
 }
 /**
  * @brief taskManager::start
- * 创建线程
+ * @details 创建线程
  */
 void taskManager::start(){
     int ret=-1;

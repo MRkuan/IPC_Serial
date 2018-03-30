@@ -24,6 +24,12 @@ public slots:
     bool setAirConditionerInfo(unsigned short arg1,unsigned short arg2,unsigned short arg3);
     bool setStartInfo(unsigned char arg1);
 signals:
+    /**
+     * @brief broadcastCANInfo
+     * @details 广播CAN数据
+     * @param candata
+     * @param len
+     */
     void broadcastCANInfo(QByteArray candata,unsigned char len);
 
 private:

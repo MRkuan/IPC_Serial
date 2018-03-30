@@ -13,12 +13,11 @@ DataLinkLayer::~DataLinkLayer()
 
 }
 /**
- * @brief DataLinkLayer::splitDLFrame
- * function：数据链路层解包Data Link layer(DL)
- * 解包，防止出现接收一次的数据buf里面包含多包数据的情况，以及上一包数据需和下一包数据拼包的情况，将解好的数据包放入msqQueue
+ * @brief 数据链路层解包Data Link layer(DL)
+ * @details 解包，防止出现接收一次的数据buf里面包含多包数据的情况，以及上一包数据需和下一包数据拼包的情况，将解好的数据包放入msqQueue
  * 队列里DL层数据结构为：Frame_Header+Packet_Header+APP_Data+FCS+Frame_Tail
- * @param buf
- * @param datalength
+ * @param buf 待处理数据首地址
+ * @param datalength 待处理数据长度
  */
 void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
     static bool needRecombine = 0;//是否需要与上一包组包

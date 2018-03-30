@@ -73,44 +73,54 @@ __attribute__((unused)) static unsigned char g_SN=0;
 __attribute__((unused)) static int g_clientRWS=100;
 __attribute__((unused)) static sem_t* g_semaphore;
 
-
+/**
+ * @brief PacketHeader 数据包，数据链路层的包头
+ */
 union U_PacketHeader{
     struct{
-        unsigned int LENapp:12;  //20~31
-        unsigned int Reserved:4; //16~19
-        unsigned int SN:6;       //10~15
-        unsigned int CID:7;      //3~9
-        unsigned int PT:3;       //0~2//上左下右
+        unsigned int LENapp:12;  ///< 20~31
+        unsigned int Reserved:4; ///< 16~19
+        unsigned int SN:6;       ///< 10~15
+        unsigned int CID:7;      ///< 3~9
+        unsigned int PT:3;       ///< 0~2//上左下右
     }Packet_Header;
     unsigned int value;
 };
 
-
+/**
+ * @brief The U_ACKpacket union 回应包，数据链路层的包头
+ */
 union U_ACKpacket{
     struct{
-        unsigned int RWS:12;  //20~31
-        unsigned int ET:4;      //16~19
-        unsigned int ACK_SN:6;   //10~15
-        unsigned int CID:7;      //3~9
-        unsigned int PT:3;       //0~2//上左下右
+        unsigned int RWS:12;  ///< 20~31
+        unsigned int ET:4;      ///< 16~19
+        unsigned int ACK_SN:6;   ///< 10~15
+        unsigned int CID:7;      ///< 3~9
+        unsigned int PT:3;       ///<0~2//上左下右
     }ACK_Packet;
         unsigned int value;
 };
 
+/**
+ * @brief The U_Tag union
+ * @detial TLV的Tag，Tag包含三级，分别要业务类型，一级子业务，二级子业务
+ */
 union U_Tag{
     struct{
-        unsigned short BusinessSub2Type:5;
-        unsigned short BusinessSub1Type:6;
-        unsigned short BusinessType:5;
+        unsigned short BusinessSub2Type:5;      ///< 二级子业务
+        unsigned short BusinessSub1Type:6;      ///< 一级子业务
+        unsigned short BusinessType:5;          ///< 业务类型
     }Tag;
     unsigned short value;
 };
 
-
+/**
+ * @brief The S_TLV struct TLV结构定义
+ */
 struct S_TLV{
-    U_Tag tag;
-    unsigned char len;
-    unsigned char* value;
+    U_Tag tag;              ///<业务类型
+    unsigned char len;      ///<数据长度
+    unsigned char* value;   ///<数据首地址
 };
 
 

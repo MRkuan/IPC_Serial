@@ -3,7 +3,12 @@
 Msg2MCUhandler::Msg2MCUhandler(){
      p_tansportLayer = new TransportLayer();
 }
-
+/**
+ * @brief Msg2MCUhandler::sendDoorInfo
+ * @details 发送车门控制信息
+ * @param arg1
+ * @param arg2
+ */
 void Msg2MCUhandler::sendDoorInfo(unsigned short arg1,unsigned short arg2){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -23,7 +28,12 @@ void Msg2MCUhandler::sendDoorInfo(unsigned short arg1,unsigned short arg2){
     tlv.value=value;
     p_tansportLayer->sendSingleTLV2MCU(ph,tlv);
 }
-
+/**
+ * @brief Msg2MCUhandler::sendLampInfo
+ * @details 发送车灯控制信息
+ * @param arg1
+ * @param arg2
+ */
 void Msg2MCUhandler::sendLampInfo(unsigned short arg1,unsigned short arg2){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -43,7 +53,12 @@ void Msg2MCUhandler::sendLampInfo(unsigned short arg1,unsigned short arg2){
     tlv.value=value;
     p_tansportLayer->sendSingleTLV2MCU(ph,tlv);
 }
-
+/**
+ * @brief Msg2MCUhandler::sendKeyInfo
+ * @details 发送车钥匙信息
+ * @param arg1
+ * @param arg2
+ */
 void Msg2MCUhandler::sendKeyInfo(unsigned short arg1,unsigned short arg2){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -64,6 +79,13 @@ void Msg2MCUhandler::sendKeyInfo(unsigned short arg1,unsigned short arg2){
     p_tansportLayer->sendSingleTLV2MCU(ph,tlv);
 }
 
+/**
+ * @brief Msg2MCUhandler::sendSpeedInfo
+ * @details 发送车速控制信息
+ * @param arg1
+ * @param arg2
+ * @param arg3
+ */
 void Msg2MCUhandler::sendSpeedInfo(unsigned short arg1,unsigned short arg2,unsigned short arg3){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -84,7 +106,13 @@ void Msg2MCUhandler::sendSpeedInfo(unsigned short arg1,unsigned short arg2,unsig
     tlv.value=value;
     p_tansportLayer->sendSingleTLV2MCU(ph,tlv);
 }
-
+/**
+ * @brief Msg2MCUhandler::sendAirConditionerInfo
+ * @details 发送空调控制信息
+ * @param arg1
+ * @param arg2
+ * @param arg3
+ */
 void Msg2MCUhandler::sendAirConditionerInfo(unsigned short arg1,unsigned short arg2,unsigned short arg3){
     U_PacketHeader ph;
     S_TLV tlv;
@@ -105,7 +133,11 @@ void Msg2MCUhandler::sendAirConditionerInfo(unsigned short arg1,unsigned short a
     tlv.value=value;
     p_tansportLayer->sendSingleTLV2MCU(ph,tlv);
 }
-
+/**
+ * @brief Msg2MCUhandler::sendStartInfo
+ * @details 发送start控制信息
+ * @param arg1
+ */
 void Msg2MCUhandler::sendStartInfo(unsigned char arg1){
     U_PacketHeader ph;
     S_TLV tlv;

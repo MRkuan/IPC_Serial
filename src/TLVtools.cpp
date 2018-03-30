@@ -13,7 +13,7 @@ TLVtools::~TLVtools()
  * @brief TLVtools::singleTLVRevProcessor
  * @param appDataBuff 数据地址
  * @param totallen 数据长度
- * 解析接收到的单包TLV
+ * @details 解析接收到的单包TLV
  * @return
  */
 int TLVtools::singleTLVRevProcessor(unsigned char* appDataBuff,unsigned short totallen){
@@ -36,7 +36,7 @@ int TLVtools::singleTLVRevProcessor(unsigned char* appDataBuff,unsigned short to
  * @brief TLVtools::multiTLVRecvProcessor
  * @param appDataBuff 数据地址
  * @param totallen 数据长度
- * 解析接收到的多包TLV
+ * @details 解析接收到的多包TLV
  * @return
  */
 int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short totallen){
@@ -72,6 +72,7 @@ int TLVtools::multiTLVRecvProcessor(unsigned char* appDataBuff,unsigned short to
 }
 /**
  * @brief TLVtools::TLVTable
+ * @details TLV业务表
  * @param tag1
  * @param tag2
  * @param tag3

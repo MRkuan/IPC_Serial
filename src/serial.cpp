@@ -7,7 +7,16 @@
 #include "timeout.h"
 #include "common.h"
 #if defined(__WIN32__) || defined(__CYGWIN__)
-
+    /**
+     * @brief serial::Open
+     * @details 打开串口并配置串口
+     * @param port  串口名
+     * @param baud 波特率
+     * @param bits 数据位
+     * @param parity 校验位
+     * @param stopbit 停止位
+     * @return
+     */
 	char serial::Open(char* port, int baud, char bits, parity parity, char stopbit) 
 	{
         char tmp[FramLenMax];
@@ -101,13 +110,23 @@
 	
 		return 1;
 	}
-	
+
+    /**
+     * @brief serial::Close
+     * @details 关闭串口
+     */
 	void serial::Close(void) 
 	{
 		CloseHandle(m_fd);
 	}
 	
-	
+    /**
+     * @brief serial::Write
+     * @details 往串口写数据
+     * @param buffer 待发送数据的首地址
+     * @param length 待发送数据的长度
+     * @return 0:error 1:success
+     */
     char serial::Write(unsigned char* buffer, int length)
 	{
 		DWORD r;
@@ -132,7 +151,12 @@
 	
 		return 1;
 	}
-	
+    /**
+     * @brief serial::Read
+     * @details 从串口读数据
+     * @param buffer 读到的数据存放的位置
+     * @return 读到的数据的长度
+     */
     int serial::Read(unsigned char* buffer)
 	{
 		DWORD r = 1;
@@ -154,7 +178,16 @@
 	}
 
 #else
-
+    /**
+     * @brief serial::Open
+     * @details 打开串口并配置串口
+     * @param port  串口名
+     * @param baud 波特率
+     * @param bits 数据位
+     * @param parity 校验位
+     * @param stopbit 停止位
+     * @return
+     */
 	char serial::Open(char* port, int baud, char bits, parity parity, char stopbit) 
 	{
         char tmp[FramLenMax];
@@ -253,7 +286,10 @@
 	
 		return 1;
 	}
-	
+    /**
+     * @brief serial::Close
+     * @details 关闭串口
+     */
 	void serial::Close(void) 
 	{
    		// Set old parameters
@@ -266,7 +302,13 @@
 		}
 	}
 	
-	
+    /**
+     * @brief serial::Write
+     * @details 往串口写数据
+     * @param buffer 待发送数据的首地址
+     * @param length 待发送数据的长度
+     * @return 0:error 1:success
+     */
     char serial::Write(unsigned char* buffer, int length)
 	{
 		ssize_t r;
@@ -288,7 +330,12 @@
 
 		return 1;
 	}
-	
+    /**
+     * @brief serial::Read
+     * @details 从串口读数据
+     * @param buffer 读到的数据存放的位置
+     * @return 读到的数据的长度
+     */
     int serial::Read(unsigned char* buffer)
 	{
 		ssize_t r = 1;

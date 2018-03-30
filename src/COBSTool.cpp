@@ -13,13 +13,11 @@ COBSTool::~COBSTool()
 
 /**
  * @brief StuffData 编码
- * StuffData byte stuffs “length” bytes of
- * data at the location pointed to by “ptr”,
- * writing the output to the location pointed
- * to by “dst”.
- * @param ptr
- * @param length
- * @param dst
+ * @details StuffData byte stuffs “length” bytes of data at the location pointed to by “ptr”,
+ * writing the output to the location pointed to by “dst”.
+ * @param ptr 待编码的数据首地址
+ * @param length 待编码的数据长度
+ * @param dst 编码后的目标地址
  */
 void COBSTool::StuffData(const unsigned char *ptr, unsigned long length,unsigned char *dst)
 {
@@ -44,13 +42,11 @@ void COBSTool::StuffData(const unsigned char *ptr, unsigned long length,unsigned
 
 /**
  * @brief UnStuffData 解码
- * UnStuffData decodes “length” bytes of
- * data at the location pointed to by “ptr”,
- * writing the output to the location pointed
- * to by “dst”.
- * @param ptr
- * @param length
- * @param dst
+ * @details  UnStuffData decodes “length” bytes of data at the location pointed to by “ptr”,
+ * writing the output to the location pointed to by “dst”.
+ * @param ptr 待解码的数据首地址
+ * @param length 待解码的数据长度
+ * @param dst 解码后的目标地址
  */
 void COBSTool::UnStuffData(const unsigned char *ptr, unsigned long length,unsigned char *dst)
 {

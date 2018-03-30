@@ -22,7 +22,7 @@ TransportLayer::~TransportLayer()
 }
 /**
  * @brief TransportLayer::sendMultiTLV2MCUtest
- * 发送多TLV消息测试
+ * @details 发送多TLV消息测试
  */
 void TransportLayer::sendMultiTLV2MCUtest(){
     U_PacketHeader ph;
@@ -51,7 +51,7 @@ void TransportLayer::sendMultiTLV2MCUtest(){
 
 /**
  * @brief TransportLayer::sendSingleTLV2MCUtest
- * 发送单TLV消息测试
+ * @details 发送单TLV消息测试
  */
 void TransportLayer::sendSingleTLV2MCUtest(){
     U_PacketHeader ph;
@@ -72,9 +72,10 @@ void TransportLayer::sendSingleTLV2MCUtest(){
 
 /**
  * @brief TransportLayer::sendMultiTLV2MCU
- * @param m_ph
- * @param m_tlv
- * @param TLVCount
+ * @details 发送多TLV消息
+ * @param m_ph 包头
+ * @param m_tlv tlv数组首地址
+ * @param TLVCount tlv个数
  * 发送多TLV消息接口
  */
 void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLVCount){
@@ -137,9 +138,9 @@ void TransportLayer::sendMultiTLV2MCU(U_PacketHeader& m_ph,S_TLV m_tlv[],int TLV
 
 /**
  * @brief TransportLayer::sendSingleTLV2MCU
- * @param m_ph
- * @param m_tlv
- * 发送单TLV消息接口
+ * @details 发送单TLV消息
+ * @param m_ph 包头
+ * @param m_tlv tlv数据首地址
  */
 void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
     unsigned char fcs;
@@ -192,7 +193,11 @@ void TransportLayer::sendSingleTLV2MCU(U_PacketHeader& m_ph,S_TLV& m_tlv){
     return;
 
 }
-
+/**
+ * @brief TransportLayer::replyACK
+ * @details 回复ACK
+ * @param m_Ack
+ */
 void TransportLayer::replyACK(U_ACKpacket m_Ack){
     unsigned char fcs;
     unsigned char rawbuf[FramLenMax];
@@ -223,9 +228,9 @@ void TransportLayer::replyACK(U_ACKpacket m_Ack){
 
 /**
  * @brief TransportLayer::splitTPData
- * TP层数据结构为：Packet_Header+APP_Data
- * @param buf
- * @param datalen
+ * @details 传输层对数据进行解包 TP层数据结构为：Packet_Header+APP_Data
+ * @param buf  数据首地址
+ * @param datalen 数据长度
  */
 void TransportLayer::splitTPData(unsigned char* buf,unsigned int datalen){
     U_PacketHeader uph;
