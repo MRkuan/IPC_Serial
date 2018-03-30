@@ -14,6 +14,7 @@
 #include "DataLinkLayer.h"
 #include "TransportLayer.h"
 #include <pthread.h>
+#include "SerialServer.h"
 class taskManager
 {
 public:
@@ -22,16 +23,22 @@ public:
     int serialComInit();
     static void* taskRecvSerialMsg(void *);
     static void* taskProcessSerialMsg(void *);
+    static void* taskSendSerialMsg(void *);
+    static void* taskSerialTest(void *);
     void start();
+    void initSystem();
 
 private:
 
 
     pthread_t serialRecv;
     pthread_t serialProcessor;
+    pthread_t serialSend;
+    pthread_t serialTest;
     DataLinkLayer mDataLinkLayerProcessor;
     TransportLayer mTransportLayerProcessor;
     COBSTool mCOBStool;
+
 };
 
 #endif // taskManager_H

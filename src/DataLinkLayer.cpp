@@ -3,8 +3,8 @@
 extern MsgQueue* m_MsgQueue;
 DataLinkLayer::DataLinkLayer()
 {
-    if(g_MsgQueue==NULL){
-        g_MsgQueue = getMsgQueue();
+    if(g_MsgQueueRecv==NULL){
+        g_MsgQueueRecv = getMsgQueueRecv();
     }
 }
 
@@ -13,12 +13,11 @@ DataLinkLayer::~DataLinkLayer()
 
 }
 /**
- * @brief DataLinkLayer::splitDLFrame
- * function：数据链路层解包Data Link layer(DL)
- * 解包，防止出现接收一次的数据buf里面包含多包数据的情况，以及上一包数据需和下一包数据拼包的情况，将解好的数据包放入msqQueue
+ * @brief 数据链路层解包Data Link layer(DL)
+ * @details 解包，防止出现接收一次的数据buf里面包含多包数据的情况，以及上一包数据需和下一包数据拼包的情况，将解好的数据包放入msqQueue
  * 队列里DL层数据结构为：Frame_Header+Packet_Header+APP_Data+FCS+Frame_Tail
- * @param buf
- * @param datalength
+ * @param buf 待处理数据首地址
+ * @param datalength 待处理数据长度
  */
 void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
     static bool needRecombine = 0;//是否需要与上一包组包
@@ -36,7 +35,7 @@ void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
                 memcpy(mediaBuf+mediaBufIndex,buf,tailIndex);
                 mediaBufIndex+=(tailIndex);
                 //将mediaBuf中数据enqueue到队列中,长度为mediaBufIndex
-                g_MsgQueue->Enqueue(mediaBuf,mediaBufIndex);
+                g_MsgQueueRecv->Enqueue(mediaBuf,mediaBufIndex);
                 headTailCout=0;
                 mediaBufIndex = 0;
             }else if(1==headTailCout%2){
@@ -50,7 +49,7 @@ void DataLinkLayer::splitDLFrame(unsigned char* buf,int datalength){
                     tailIndex = i+1;
                     memcpy(mediaBuf,buf+headIndex,tailIndex-headIndex);//headIndex到i之间就是一组数据
                     //将mediaBuf中数据enqueue到队列中,长度为tailIndex-headIndex
-                    g_MsgQueue->Enqueue(mediaBuf,tailIndex-headIndex);
+                    g_MsgQueueRecv->Enqueue(mediaBuf,tailIndex-headIndex);
                     mediaBufIndex = 0;
                 }
             }

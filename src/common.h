@@ -8,7 +8,8 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
-//#include <linux/input.h>
+#include <semaphore.h>
+#include <time.h>
 #include "MsgQueue.h"
 #include "serial.h"
 
@@ -52,53 +53,74 @@
 #define UART_Err(fmt,args...) /*do nothing */
 #endif
 
-
+#define UNUSED(x) (void)(x)
 #define Frame_Head_Tail_Send 0x00
 #define Frame_Head_Tail_Recv 0x00
 #define TRUE 1
 #define FALSE 0
-//#define NOTEST
+//Nanoseconds [0 .. 999999999]
+#define NSECTOSEC    1000000000
+#define NOTEST
 const int FramLenMax=256;
-static serial* g_serialCom;
-static MsgQueue* g_MsgQueue;
+const unsigned char max_SN = 64;
+const unsigned int MaxQueueLen=20;
+const unsigned int nano_sec = 60*1000*1000;
 
+__attribute__((unused)) static serial* g_serialCom;
+__attribute__((unused)) static MsgQueue* g_MsgQueueRecv;
+__attribute__((unused)) static MsgQueue* g_MsgQueueSend;
+__attribute__((unused)) static unsigned char g_SN=0;
+__attribute__((unused)) static int g_clientRWS=100;
+__attribute__((unused)) static sem_t* g_semaphore;
+
+/**
+ * @brief PacketHeader 数据包，数据链路层的包头
+ */
 union U_PacketHeader{
     struct{
-        unsigned int LENapp:12;  //20~31
-        unsigned int Reserved:4; //16~19
-        unsigned int SN:6;       //10~15
-        unsigned int CID:7;      //3~9
-        unsigned int PT:3;       //0~2//上左下右
+        unsigned int LENapp:12;  ///< 20~31
+        unsigned int Reserved:4; ///< 16~19
+        unsigned int SN:6;       ///< 10~15
+        unsigned int CID:7;      ///< 3~9
+        unsigned int PT:3;       ///< 0~2//上左下右
     }Packet_Header;
     unsigned int value;
 };
 
-
+/**
+ * @brief The U_ACKpacket union 回应包，数据链路层的包头
+ */
 union U_ACKpacket{
     struct{
-        unsigned int RWS:12;  //20~31
-        unsigned int ET:4;      //16~19
-        unsigned int ACK_SN:6;   //10~15
-        unsigned int CID:7;      //3~9
-        unsigned int PT:3;       //0~2//上左下右
+        unsigned int RWS:12;  ///< 20~31
+        unsigned int ET:4;      ///< 16~19
+        unsigned int ACK_SN:6;   ///< 10~15
+        unsigned int CID:7;      ///< 3~9
+        unsigned int PT:3;       ///<0~2//上左下右
     }ACK_Packet;
         unsigned int value;
 };
 
+/**
+ * @brief The U_Tag union
+ * @detial TLV的Tag，Tag包含三级，分别要业务类型，一级子业务，二级子业务
+ */
 union U_Tag{
     struct{
-        unsigned short BusinessSub2Type:5;
-        unsigned short BusinessSub1Type:6;
-        unsigned short BusinessType:5;
+        unsigned short BusinessSub2Type:5;      ///< 二级子业务
+        unsigned short BusinessSub1Type:6;      ///< 一级子业务
+        unsigned short BusinessType:5;          ///< 业务类型
     }Tag;
     unsigned short value;
 };
 
-
+/**
+ * @brief The S_TLV struct TLV结构定义
+ */
 struct S_TLV{
-    U_Tag tag;
-    unsigned char len;
-    unsigned char* value;
+    U_Tag tag;              ///<业务类型
+    unsigned char len;      ///<数据长度
+    unsigned char* value;   ///<数据首地址
 };
 
 
@@ -131,5 +153,17 @@ unsigned char GetFCS_8(unsigned char *pbuf, unsigned int len);
 
 serial* getSerialCom();
 
-MsgQueue* getMsgQueue();
+MsgQueue* getMsgQueueRecv();
+
+MsgQueue* getMsgQueueSend();
+
+sem_t* getSemaphore();
+
+unsigned char getSN();
+
+unsigned int getClientRWS();
+
+void setClientRWS(unsigned int rws);
+
+
 #endif	//__COMMON_H
